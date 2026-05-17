@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐠 Let's Go to the Aquarium! | すいぞくかんへいこう！</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean-deep:#0a1628; --ocean-mid:#0d2545; --ocean-surface:#1a3a6b;
+  --teal:#00b4d8; --cyan:#48cae4; --aqua:#90e0ef;
+  --coral:#ff6b6b; --yellow:#ffd166; --green:#06d6a0;
+  --purple:#8b5cf6; --pink:#f472b6; --white:#f0f9ff;
+  --card-bg:rgba(255,255,255,0.07); --card-border:rgba(0,180,216,0.3);
+  --radius:20px; --shadow:0 8px 32px rgba(0,0,0,0.4);
+  --glow:0 0 20px rgba(0,180,216,0.5);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{font-family:'Nunito',sans-serif;background:var(--ocean-deep);color:var(--white);overflow-x:hidden;min-height:100vh;}
+
+/* BUBBLES */
+#bubbles-bg{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;overflow:hidden;}
+.bubble{position:absolute;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(0,180,216,0.4),rgba(0,180,216,0.05));border:1px solid rgba(0,180,216,0.2);animation:floatUp linear infinite;bottom:-100px;}
+@keyframes floatUp{0%{transform:translateX(0) scale(1);opacity:0.7;}50%{transform:translateX(30px) scale(1.1);opacity:0.5;}100%{transform:translateX(-20px) scale(0.8);opacity:0;bottom:110vh;}}
+
+/* TOP BAR */
+#top-bar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,22,40,0.95);backdrop-filter:blur(12px);border-bottom:2px solid var(--teal);padding:10px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,0.5);}
+#top-bar .title-bar{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--cyan);flex:1;}
+#progress-bar-wrap{flex:2;height:10px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;}
+#progress-bar{height:100%;background:linear-gradient(90deg,var(--teal),var(--green));border-radius:10px;transition:width 0.4s ease;width:0%;box-shadow:0 0 10px var(--teal);}
+#score-box{background:linear-gradient(135deg,var(--teal),var(--purple));padding:4px 14px;border-radius:20px;font-weight:800;font-size:0.95rem;min-width:70px;text-align:center;box-shadow:var(--glow);}
+
+/* BADGE BAR */
+#badge-bar{position:fixed;top:54px;left:0;right:0;z-index:99;background:rgba(10,22,40,0.9);border-bottom:1px solid rgba(0,180,216,0.2);padding:6px 20px;display:flex;gap:8px;flex-wrap:wrap;min-height:38px;align-items:center;}
+.badge{background:linear-gradient(135deg,#ffd166,#ff6b6b);color:#1a1209;padding:3px 12px;border-radius:20px;font-size:0.78rem;font-weight:800;animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 2px 8px rgba(0,0,0,0.3);}
+@keyframes popIn{0%{transform:scale(0) rotate(-15deg);opacity:0;}70%{transform:scale(1.2) rotate(5deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
+
+/* MAIN */
+#main-container{padding-top:100px;padding-bottom:80px;min-height:100vh;position:relative;z-index:1;}
+
+/* SLIDES */
+.slide{display:none;max-width:860px;margin:0 auto;padding:20px 16px 100px;animation:slideIn 0.5s cubic-bezier(0.34,1.2,0.64,1);}
+.slide.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateY(30px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* CARDS */
+.card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:20px;backdrop-filter:blur(8px);box-shadow:var(--shadow);margin-bottom:16px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--purple),var(--coral));}
+
+/* HERO */
+.hero{position:relative;border-radius:var(--radius);overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow),var(--glow);border:2px solid var(--teal);}
+.hero img{width:100%;height:320px;object-fit:cover;display:block;}
+.hero-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(10,22,40,0.95));padding:30px 24px 20px;}
+.hero-overlay h1{font-family:'Fredoka One',cursive;font-size:clamp(1.6rem,5vw,2.8rem);color:var(--cyan);text-shadow:0 0 20px rgba(0,180,216,0.8);margin-bottom:6px;}
+.hero-overlay p{font-size:1rem;color:var(--aqua);opacity:0.9;}
+
+/* SLIDE HEADERS */
+.slide-header{text-align:center;margin-bottom:20px;}
+.slide-header h2{font-family:'Fredoka One',cursive;font-size:clamp(1.4rem,4vw,2rem);color:var(--cyan);text-shadow:var(--glow);margin-bottom:6px;}
+.slide-header p{color:var(--aqua);font-size:0.95rem;}
+.slide-number{display:inline-block;background:linear-gradient(135deg,var(--teal),var(--purple));color:white;width:32px;height:32px;border-radius:50%;text-align:center;line-height:32px;font-weight:800;font-size:0.85rem;margin-bottom:8px;box-shadow:var(--glow);}
+
+/* TAGS */
+.tag{display:inline-block;padding:4px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;margin:3px;}
+.tag-vocab{background:var(--teal);color:#0a1628;}
+.tag-game{background:var(--coral);color:white;}
+.tag-speak{background:var(--green);color:#0a1628;}
+.tag-listen{background:var(--yellow);color:#0a1628;}
+.tag-type{background:var(--purple);color:white;}
+
+/* VOCAB GRID */
+.vocab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:16px;}
+.vocab-card{background:linear-gradient(135deg,var(--ocean-mid),var(--ocean-surface));border:1px solid var(--card-border);border-radius:var(--radius);padding:16px 12px;text-align:center;cursor:pointer;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:var(--shadow);}
+.vocab-card:hover{transform:translateY(-6px) scale(1.04);border-color:var(--teal);box-shadow:0 12px 40px rgba(0,0,0,0.4),var(--glow);}
+.vocab-card:active{transform:scale(0.96);}
+.vocab-emoji{font-size:2.8rem;margin-bottom:8px;display:block;}
+.vocab-en{font-weight:800;color:var(--cyan);font-size:1rem;margin-bottom:4px;}
+.vocab-ja{font-size:0.82rem;color:var(--aqua);opacity:0.85;}
+.vocab-hint{font-size:0.78rem;color:var(--yellow);margin-top:4px;font-style:italic;}
+
+/* LISTEN LIST */
+.listen-list{display:flex;flex-direction:column;gap:12px;}
+.listen-item{display:flex;align-items:center;gap:14px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:14px 18px;cursor:pointer;transition:all 0.25s;}
+.listen-item:hover{border-color:var(--teal);background:rgba(0,180,216,0.1);transform:translateX(6px);}
+.listen-icon{font-size:1.8rem;min-width:40px;text-align:center;}
+.listen-en{font-weight:700;color:var(--cyan);font-size:1.05rem;}
+.listen-ja{font-size:0.85rem;color:var(--aqua);margin-top:2px;}
+.listen-play{margin-left:auto;font-size:1.4rem;opacity:0.6;transition:opacity 0.2s;}
+.listen-item:hover .listen-play{opacity:1;}
+
+/* PHRASE BOX */
+.phrase-box{background:linear-gradient(135deg,rgba(0,180,216,0.15),rgba(139,92,246,0.15));border:2px solid var(--teal);border-radius:var(--radius);padding:20px 24px;margin-bottom:14px;cursor:pointer;transition:all 0.3s;position:relative;}
+.phrase-box:hover{border-color:var(--cyan);transform:scale(1.02);box-shadow:var(--glow);}
+.phrase-box .phrase-en{font-size:clamp(1rem,3.5vw,1.4rem);font-weight:800;color:var(--yellow);margin-bottom:6px;font-family:'Fredoka One',cursive;}
+.phrase-box .phrase-ja{font-size:0.9rem;color:var(--aqua);margin-bottom:4px;}
+.phrase-box .phrase-ex{font-size:0.85rem;color:var(--white);opacity:0.75;font-style:italic;}
+.phrase-speaker{position:absolute;top:14px;right:16px;font-size:1.4rem;opacity:0.5;}
+
+/* SLIDE IMAGE */
+.slide-img{width:100%;height:220px;object-fit:cover;border-radius:var(--radius);margin-bottom:16px;border:1px solid var(--card-border);box-shadow:var(--shadow);}
+
+/* TYPING */
+#typing-area{display:flex;flex-direction:column;gap:14px;align-items:center;}
+#typing-prompt{font-size:clamp(1rem,3vw,1.4rem);color:var(--yellow);font-weight:800;text-align:center;}
+#typing-ja{font-size:0.9rem;color:var(--aqua);text-align:center;}
+#typing-input{background:rgba(255,255,255,0.08);border:2px solid var(--teal);border-radius:var(--radius);color:var(--white);font-size:1.2rem;font-family:'Nunito',sans-serif;padding:12px 20px;width:100%;max-width:400px;text-align:center;transition:border-color 0.3s,box-shadow 0.3s;outline:none;}
+#typing-input:focus{border-color:var(--cyan);box-shadow:var(--glow);}
+#typing-input.correct{border-color:var(--green);box-shadow:0 0 15px rgba(6,214,160,0.6);animation:correctPulse 0.5s ease;}
+#typing-input.wrong{border-color:var(--coral);box-shadow:0 0 15px rgba(255,107,107,0.6);animation:shake 0.4s ease;}
+@keyframes correctPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
+#typing-feedback{font-size:1rem;font-weight:700;height:24px;text-align:center;}
+#typing-score{font-size:0.85rem;color:var(--aqua);text-align:center;}
+#typing-progress-dots{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+.t-dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.3s;}
+.t-dot.done{background:var(--green);box-shadow:0 0 6px var(--green);}
+.t-dot.wrong-dot{background:var(--coral);}
+.key-hint{display:inline-flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+.key-letter{background:rgba(255,255,255,0.1);border:1px solid var(--card-border);border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:var(--aqua);transition:all 0.2s;}
+.key-letter.typed{background:rgba(0,180,216,0.3);border-color:var(--teal);color:var(--cyan);}
+#streak-display{text-align:center;font-size:0.9rem;margin-top:8px;transition:all 0.3s;}
+.streak-fire{color:var(--coral);font-weight:800;}
+
+/* =============================================
+   MEMORY MATCH  ― 正しい2面カード実装
+   ============================================= */
+#match-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+/* カード全体の wrapper：perspective を持つ */
+.match-card{
+  aspect-ratio:1;
+  perspective:600px;
+  cursor:pointer;
+}
+/* 実際に回転する内側 */
+.match-card-inner{
+  position:relative;
+  width:100%;
+  height:100%;
+  transform-style:preserve-3d;
+  transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);
+  border-radius:14px;
+}
+/* フリップ済み */
+.match-card.flipped .match-card-inner{
+  transform:rotateY(180deg);
+}
+/* 両面共通 */
+.match-face{
+  position:absolute;
+  inset:0;
+  border-radius:14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  box-shadow:var(--shadow);
+}
+/* 裏面（海面模様） */
+.match-back{
+  background:linear-gradient(135deg,var(--ocean-mid),var(--ocean-surface));
+  border:2px solid var(--card-border);
+  font-size:clamp(1.4rem,4vw,2rem);
+  color:rgba(0,180,216,0.4);
+}
+/* 表面（emoji＋テキスト） */
+.match-front{
+  background:linear-gradient(135deg,rgba(0,180,216,0.2),rgba(139,92,246,0.2));
+  border:2px solid var(--teal);
+  transform:rotateY(180deg); /* 最初は裏を向いている */
+}
+.match-front .mf-emoji{font-size:clamp(1.4rem,4vw,2rem);}
+.match-front .mf-text{font-size:0.68rem;font-weight:800;color:var(--cyan);text-align:center;padding:0 4px;}
+/* マッチ成功 */
+.match-card.matched .match-card-inner{
+  transform:rotateY(180deg);
+}
+.match-card.matched .match-front{
+  background:linear-gradient(135deg,rgba(6,214,160,0.3),rgba(0,180,216,0.2));
+  border-color:var(--green);
+  box-shadow:0 0 18px rgba(6,214,160,0.5);
+  animation:matchBounce 0.5s ease;
+}
+@keyframes matchBounce{0%{transform:rotateY(180deg) scale(1);}40%{transform:rotateY(180deg) scale(1.15);}100%{transform:rotateY(180deg) scale(1);}}
+#match-status{text-align:center;color:var(--aqua);font-size:0.9rem;margin-bottom:10px;}
+
+/* ROLE PLAY */
+.chat-scene{display:flex;flex-direction:column;gap:14px;}
+.chat-line{display:flex;align-items:flex-start;gap:12px;opacity:0;transform:translateY(20px);transition:all 0.4s ease;}
+.chat-line.show{opacity:1;transform:translateY(0);}
+.chat-line.right{flex-direction:row-reverse;}
+.chat-avatar{width:52px;height:52px;border-radius:50%;font-size:2rem;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--ocean-surface),var(--teal));border:2px solid var(--teal);cursor:pointer;transition:transform 0.25s,box-shadow 0.25s;flex-shrink:0;box-shadow:var(--shadow);}
+.chat-avatar:hover{transform:scale(1.15) rotate(5deg);box-shadow:var(--glow);}
+.chat-bubble{max-width:70%;padding:12px 18px;border-radius:18px;position:relative;box-shadow:var(--shadow);cursor:pointer;transition:transform 0.2s;}
+.chat-bubble:hover{transform:scale(1.02);}
+.chat-line:not(.right) .chat-bubble{background:linear-gradient(135deg,rgba(0,180,216,0.25),rgba(0,180,216,0.1));border:1px solid var(--teal);border-top-left-radius:4px;}
+.chat-line.right .chat-bubble{background:linear-gradient(135deg,rgba(139,92,246,0.25),rgba(244,114,182,0.1));border:1px solid var(--purple);border-top-right-radius:4px;}
+.chat-bubble .bubble-en{font-weight:700;font-size:clamp(0.9rem,2.5vw,1.05rem);color:var(--yellow);margin-bottom:4px;}
+.chat-bubble .bubble-ja{font-size:0.82rem;color:var(--aqua);}
+.chat-name{font-size:0.75rem;color:#6b8cb8;margin-bottom:3px;font-weight:700;}
+.chat-speaker-icon{position:absolute;bottom:6px;right:10px;font-size:0.9rem;opacity:0.5;}
+.chat-controls{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+.script-toggle-btn{background:rgba(255,255,255,0.08);border:1px solid var(--card-border);color:var(--aqua);padding:6px 16px;border-radius:20px;cursor:pointer;font-size:0.82rem;transition:all 0.2s;}
+.script-toggle-btn:hover{background:rgba(0,180,216,0.2);color:var(--cyan);}
+
+/* WHO AM I */
+#whoami-clue-box{width:100%;background:linear-gradient(135deg,rgba(0,180,216,0.1),rgba(139,92,246,0.1));border:2px solid var(--teal);border-radius:var(--radius);padding:20px;min-height:100px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;}
+.clue-text{font-size:clamp(0.95rem,2.5vw,1.1rem);color:var(--white);text-align:center;animation:fadeInClue 0.5s ease;}
+@keyframes fadeInClue{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+#whoami-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-top:14px;}
+.whoami-btn{background:var(--card-bg);border:2px solid var(--card-border);border-radius:var(--radius);padding:14px;color:var(--white);font-size:1.05rem;cursor:pointer;transition:all 0.25s;font-family:'Nunito',sans-serif;font-weight:700;}
+.whoami-btn:hover{border-color:var(--teal);transform:scale(1.04);}
+.whoami-btn.correct-ans{border-color:var(--green);background:rgba(6,214,160,0.2);box-shadow:0 0 14px rgba(6,214,160,0.5);}
+.whoami-btn.wrong-ans{border-color:var(--coral);background:rgba(255,107,107,0.15);}
+#whoami-score{font-size:0.9rem;color:var(--aqua);text-align:center;margin-top:10px;}
+
+/* =============================================
+   FIND-IT GAME
+   ============================================= */
+#findit-timer-wrap{width:100%;height:8px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;margin-bottom:10px;}
+#findit-timer-bar{height:100%;background:linear-gradient(90deg,var(--green),var(--teal));width:100%;border-radius:10px;transition:width 0.1s linear;}
+#findit-info{display:flex;justify-content:space-between;font-size:0.85rem;color:var(--aqua);margin-bottom:8px;}
+#findit-target{font-size:clamp(1.1rem,3.5vw,1.6rem);font-weight:800;color:var(--yellow);background:rgba(255,209,102,0.1);border:2px solid var(--yellow);border-radius:var(--radius);padding:12px 24px;display:inline-block;margin-bottom:6px;box-shadow:0 0 20px rgba(255,209,102,0.3);animation:pulse 1.5s ease infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 10px rgba(255,209,102,0.3);}50%{box-shadow:0 0 25px rgba(255,209,102,0.7);}}
+#findit-display{text-align:center;margin-bottom:12px;}
+#findit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.findit-option{background:var(--card-bg);border:2px solid var(--card-border);border-radius:var(--radius);padding:14px 8px;cursor:pointer;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);text-align:center;font-size:1rem;font-weight:700;color:var(--white);display:flex;flex-direction:column;align-items:center;gap:6px;}
+.findit-option .fi-emoji{font-size:2rem;}
+.findit-option:hover{border-color:var(--teal);transform:scale(1.06);box-shadow:var(--glow);}
+.findit-option.correct-pick{border-color:var(--green);background:rgba(6,214,160,0.2);animation:bounceIn 0.4s ease;}
+.findit-option.wrong-pick{border-color:var(--coral);background:rgba(255,107,107,0.15);animation:shake 0.4s ease;}
+@keyframes bounceIn{0%{transform:scale(0.9);}60%{transform:scale(1.15);}100%{transform:scale(1);}}
+
+/* =============================================
+   GAME 2: FEEDING TIME!（新ゲーム）
+   ============================================= */
+#feed-scene{
+  position:relative;
+  background:linear-gradient(180deg,#0a2a4a 0%,#0d3a6b 40%,#1a5c8a 100%);
+  border-radius:var(--radius);
+  overflow:hidden;
+  border:2px solid var(--teal);
+  box-shadow:var(--shadow),var(--glow);
+  min-height:320px;
+  margin-bottom:12px;
+}
+#feed-bubbles-layer{position:absolute;inset:0;pointer-events:none;}
+.feed-bubble-anim{
+  position:absolute;
+  border-radius:50%;
+  background:rgba(0,180,216,0.15);
+  border:1px solid rgba(0,180,216,0.3);
+  animation:feedBubble linear infinite;
+  pointer-events:none;
+}
+@keyframes feedBubble{
+  0%{transform:translateY(0);opacity:0.7;}
+  100%{transform:translateY(-340px);opacity:0;}
+}
+/* 落ちてくる餌 */
+.food-item{
+  position:absolute;
+  font-size:2.2rem;
+  cursor:pointer;
+  user-select:none;
+  animation:fallDown linear forwards;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  z-index:5;
+  transition:transform 0.1s;
+}
+.food-item:hover{transform:scale(1.2);}
+@keyframes fallDown{
+  from{top:-60px;}
+  to{top:110%;}
+}
+/* 魚たち */
+#fish-row{
+  position:absolute;
+  bottom:20px;
+  left:0;right:0;
+  display:flex;
+  justify-content:space-around;
+  align-items:flex-end;
+  padding:0 20px;
+}
+.fish-char{
+  font-size:2.6rem;
+  animation:fishSwim 2s ease-in-out infinite;
+  cursor:default;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+  transition:transform 0.2s;
+  position:relative;
+}
+.fish-char.eating{animation:fishEat 0.5s ease !important;}
+@keyframes fishSwim{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes fishEat{0%{transform:scale(1);}40%{transform:scale(1.4) rotate(10deg);}100%{transform:scale(1);}}
+/* 英語ラベル表示 */
+#feed-word-display{
+  text-align:center;
+  background:rgba(0,0,0,0.5);
+  padding:10px 16px;
+  border-radius:var(--radius);
+  margin-bottom:10px;
+}
+#feed-word-en{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--yellow);margin-bottom:4px;}
+#feed-word-ja{font-size:0.9rem;color:var(--aqua);}
+#feed-status{display:flex;justify-content:space-between;font-size:0.85rem;color:var(--aqua);margin-bottom:8px;}
+#feed-score-bar{height:6px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;margin-bottom:10px;}
+#feed-score-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--green));border-radius:10px;transition:width 0.4s;}
+.food-label{
+  position:absolute;
+  background:rgba(0,0,0,0.7);
+  color:var(--white);
+  font-size:0.72rem;
+  font-weight:700;
+  padding:2px 8px;
+  border-radius:10px;
+  white-space:nowrap;
+  top:-24px;
+  left:50%;
+  transform:translateX(-50%);
+  pointer-events:none;
+  border:1px solid rgba(255,255,255,0.2);
+}
+#feed-feedback{
+  text-align:center;
+  font-size:1.1rem;
+  font-weight:800;
+  min-height:28px;
+  margin-bottom:6px;
+  transition:all 0.3s;
+}
+.feed-wrong-flash{
+  position:absolute;
+  inset:0;
+  background:rgba(255,107,107,0.25);
+  pointer-events:none;
+  animation:flashFade 0.4s ease forwards;
+  border-radius:var(--radius);
+}
+@keyframes flashFade{from{opacity:1;}to{opacity:0;}}
+
+/* =============================================
+   GAME 3: MIKKE!（改善版）
+   ============================================= */
+#mikke-wrapper{position:relative;border-radius:var(--radius);overflow:hidden;border:2px solid var(--teal);box-shadow:var(--shadow),var(--glow);touch-action:none;user-select:none;}
+#mikke-img{width:100%;height:360px;object-fit:cover;display:block;}
+#mikke-overlay{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;}
+.mikke-target{
+  position:absolute;
+  font-size:clamp(1.8rem,5vw,2.6rem);
+  cursor:pointer;
+  pointer-events:all;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8));
+  animation:bobble 2.5s ease-in-out infinite;
+  transform-origin:center;
+  z-index:5;
+  /* ヒント：発見しやすいよう半透明のリングを追加 */
+}
+/* 発見前：少し透明にして難易度調整 */
+.mikke-target::before{
+  content:'';
+  position:absolute;
+  inset:-8px;
+  border-radius:50%;
+  border:2px dashed rgba(255,255,255,0.3);
+  animation:ringPulse 2s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes ringPulse{0%,100%{opacity:0.3;transform:scale(1);}50%{opacity:0.7;transform:scale(1.1);}}
+.mikke-target:hover{transform:scale(1.3) !important;filter:drop-shadow(0 0 8px var(--yellow));}
+.mikke-target.found{animation:foundSpin 0.6s ease forwards !important;pointer-events:none;}
+@keyframes bobble{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-6px) scale(1.05);}}
+@keyframes foundSpin{0%{transform:scale(1) rotate(0);opacity:1;}50%{transform:scale(1.6) rotate(180deg);opacity:0.6;}100%{transform:scale(0) rotate(360deg);opacity:0;}}
+#mikke-target-display{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
+.mikke-target-chip{background:rgba(255,255,255,0.08);border:1px solid var(--card-border);border-radius:20px;padding:5px 14px;font-size:0.85rem;display:flex;align-items:center;gap:6px;transition:all 0.3s;}
+.mikke-target-chip.found{background:rgba(6,214,160,0.2);border-color:var(--green);text-decoration:line-through;opacity:0.7;}
+#mikke-room-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+#mikke-room-name{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--cyan);}
+#mikke-timer-display{background:rgba(255,255,255,0.1);padding:4px 14px;border-radius:20px;font-weight:700;font-size:0.9rem;}
+#mikke-found-count{font-size:0.85rem;color:var(--aqua);text-align:center;margin-top:8px;}
+#mikke-timer-wrap{height:6px;background:rgba(255,255,255,0.1);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+#mikke-timer-bar{height:100%;background:linear-gradient(90deg,var(--coral),var(--yellow));border-radius:10px;transition:width 0.5s linear;}
+/* ヒントボタン */
+#mikke-hint-btn{
+  display:block;
+  margin:8px auto 0;
+  background:rgba(255,209,102,0.15);
+  border:1px solid var(--yellow);
+  color:var(--yellow);
+  padding:5px 18px;
+  border-radius:20px;
+  font-size:0.82rem;
+  cursor:pointer;
+  font-family:'Nunito',sans-serif;
+  font-weight:700;
+  transition:all 0.2s;
+}
+#mikke-hint-btn:hover{background:rgba(255,209,102,0.3);}
+.mikke-hint-flash{
+  position:absolute;
+  border-radius:50%;
+  background:rgba(255,209,102,0.5);
+  border:3px solid var(--yellow);
+  width:60px;height:60px;
+  pointer-events:none;
+  animation:hintFlash 1s ease forwards;
+  z-index:10;
+  transform:translate(-50%,-50%);
+}
+@keyframes hintFlash{0%{opacity:1;transform:translate(-50%,-50%) scale(0.5);}70%{opacity:0.8;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5);}}
+
+/* =============================================
+   FISH QUIZ（改善版）
+   ============================================= */
+#fishquiz-img{width:100%;height:200px;object-fit:cover;border-radius:var(--radius);margin-bottom:14px;border:2px solid var(--teal);}
+#fishquiz-question{font-size:clamp(1rem,3vw,1.2rem);font-weight:800;color:var(--yellow);text-align:center;margin-bottom:16px;min-height:48px;line-height:1.5;}
+#fishquiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fq-btn{background:var(--card-bg);border:2px solid var(--card-border);border-radius:var(--radius);padding:14px;color:var(--white);font-size:0.95rem;cursor:pointer;transition:all 0.25s;font-family:'Nunito',sans-serif;font-weight:700;display:flex;align-items:center;gap:8px;justify-content:center;}
+.fq-btn:hover{border-color:var(--teal);transform:scale(1.04);}
+.fq-btn.correct{border-color:var(--green);background:rgba(6,214,160,0.2);}
+.fq-btn.wrong{border-color:var(--coral);background:rgba(255,107,107,0.15);}
+#fishquiz-score{text-align:center;color:var(--aqua);font-size:0.9rem;margin-top:10px;}
+#fishquiz-prog{display:flex;gap:6px;justify-content:center;margin-bottom:12px;}
+.fq-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.3s;}
+.fq-dot.done{background:var(--green);}
+.fq-dot.fq-wrong{background:var(--coral);}
+
+/* WORD SCRAMBLE */
+#scramble-word{font-family:'Fredoka One',cursive;font-size:clamp(1.8rem,5vw,3rem);color:var(--yellow);text-align:center;letter-spacing:8px;text-shadow:0 0 15px rgba(255,209,102,0.5);margin-bottom:10px;}
+#scramble-hint{text-align:center;color:var(--aqua);font-size:0.9rem;margin-bottom:16px;}
+#scramble-options{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:14px;}
+.scr-letter{background:linear-gradient(135deg,var(--teal),var(--purple));color:white;width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;cursor:pointer;transition:all 0.25s;box-shadow:var(--shadow);user-select:none;}
+.scr-letter:hover{transform:translateY(-4px) scale(1.1);}
+.scr-letter.used{opacity:0.3;cursor:not-allowed;}
+#scramble-answer{display:flex;gap:8px;justify-content:center;min-height:52px;margin-bottom:12px;flex-wrap:wrap;}
+.scr-slot{background:rgba(255,255,255,0.08);border:2px solid var(--card-border);border-radius:10px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;color:var(--cyan);transition:all 0.2s;}
+.scr-slot.filled{border-color:var(--teal);background:rgba(0,180,216,0.15);}
+#scramble-feedback{text-align:center;font-size:1rem;font-weight:700;min-height:24px;}
+
+/* REVIEW */
+.review-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;}
+.review-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:all 0.25s;}
+.review-card:hover{transform:translateY(-4px);border-color:var(--teal);}
+.review-emoji{font-size:2.4rem;margin-bottom:8px;}
+.review-en{font-weight:800;color:var(--cyan);margin-bottom:4px;}
+.review-ja{font-size:0.85rem;color:var(--aqua);}
+.review-ex{font-size:0.82rem;color:var(--yellow);margin-top:6px;font-style:italic;}
+
+/* SUMMARY */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:20px;}
+.summary-chip{background:linear-gradient(135deg,rgba(0,180,216,0.15),rgba(139,92,246,0.15));border:2px solid var(--teal);border-radius:var(--radius);padding:14px;text-align:center;animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;cursor:pointer;}
+.summary-chip:nth-child(1){animation-delay:0.05s;}.summary-chip:nth-child(2){animation-delay:0.1s;}.summary-chip:nth-child(3){animation-delay:0.15s;}.summary-chip:nth-child(4){animation-delay:0.2s;}.summary-chip:nth-child(5){animation-delay:0.25s;}.summary-chip:nth-child(6){animation-delay:0.3s;}
+.summary-emoji{font-size:2.2rem;margin-bottom:6px;}
+.summary-word{font-weight:800;color:var(--yellow);}
+.summary-ja{font-size:0.8rem;color:var(--aqua);margin-top:3px;}
+.summary-score-display{text-align:center;padding:20px;background:linear-gradient(135deg,rgba(0,180,216,0.15),rgba(139,92,246,0.2));border-radius:var(--radius);border:2px solid var(--teal);margin-bottom:20px;}
+.final-score{font-family:'Fredoka One',cursive;font-size:3rem;color:var(--yellow);text-shadow:0 0 20px rgba(255,209,102,0.6);}
+.final-msg{font-size:1rem;color:var(--aqua);margin-top:8px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:30px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);}
+.btn-primary{background:linear-gradient(135deg,var(--teal),var(--cyan));color:var(--ocean-deep);box-shadow:0 4px 15px rgba(0,180,216,0.4);}
+.btn-primary:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 8px 25px rgba(0,180,216,0.6);}
+.btn-coral{background:linear-gradient(135deg,var(--coral),#ff9b72);color:white;box-shadow:0 4px 15px rgba(255,107,107,0.4);}
+.btn-coral:hover{transform:translateY(-3px) scale(1.05);}
+.btn-yellow{background:linear-gradient(135deg,var(--yellow),#ffaa33);color:var(--ocean-deep);box-shadow:0 4px 15px rgba(255,209,102,0.4);}
+.btn-yellow:hover{transform:translateY(-3px) scale(1.05);}
+.btn-green{background:linear-gradient(135deg,var(--green),#04c087);color:var(--ocean-deep);box-shadow:0 4px 15px rgba(6,214,160,0.4);}
+.btn-green:hover{transform:translateY(-3px) scale(1.05);}
+.btn-sm{padding:8px 18px;font-size:0.88rem;}
+.btn:active{transform:scale(0.95);}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none !important;}
+.btn-center{display:flex;justify-content:center;margin-top:16px;}
+.btn-ripple{position:relative;overflow:hidden;}
+
+/* NAV BAR */
+#nav-btns{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,22,40,0.97);border-top:2px solid var(--teal);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);gap:10px;}
+#nav-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;flex:1;}
+.nav-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.3s;cursor:pointer;}
+.nav-dot.active{background:var(--teal);box-shadow:0 0 8px var(--teal);transform:scale(1.3);}
+.nav-dot.done{background:var(--green);}
+
+/* OVERLAY */
+#overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,22,40,0.92);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+#overlay.show{display:flex;}
+#overlay-box{background:linear-gradient(135deg,var(--ocean-mid),var(--ocean-surface));border:2px solid var(--teal);border-radius:var(--radius);padding:32px 28px;max-width:420px;width:90%;text-align:center;box-shadow:var(--shadow),var(--glow);animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);}
+#overlay-emoji{font-size:3.5rem;margin-bottom:12px;}
+#overlay-title{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--yellow);margin-bottom:8px;}
+#overlay-msg{color:var(--aqua);font-size:0.95rem;margin-bottom:20px;white-space:pre-line;}
+
+/* CONFETTI */
+#confetti-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:300;}
+
+/* FISH FACT */
+.fish-fact{background:linear-gradient(135deg,rgba(0,180,216,0.08),rgba(139,92,246,0.08));border-left:4px solid var(--teal);border-radius:0 var(--radius) var(--radius) 0;padding:12px 16px;font-size:0.9rem;color:var(--aqua);margin-top:12px;position:relative;padding-left:24px;}
+.fish-fact::before{content:'🐠';position:absolute;left:-14px;top:50%;transform:translateY(-50%);}
+
+/* HIGHLIGHT WORDS */
+.hl-find{color:var(--coral);font-weight:800;background:rgba(255,107,107,0.15);border-radius:4px;padding:0 3px;}
+.hl-see{color:var(--yellow);font-weight:800;}
+
+/* RESPONSIVE */
+@media(max-width:540px){
+  #match-grid{grid-template-columns:repeat(4,1fr);}
+  #findit-grid{grid-template-columns:repeat(2,1fr);}
+  #fishquiz-options{grid-template-columns:1fr;}
+  .vocab-grid{grid-template-columns:repeat(2,1fr);}
+  .hero img{height:220px;}
+  #whoami-options{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div id="bubbles-bg"></div>
+<canvas id="confetti-canvas"></canvas>
+
+<!-- TOP BAR -->
+<div id="top-bar">
+  <div class="title-bar">🐠 Aquarium English</div>
+  <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+  <div id="score-box">⭐ <span id="score-num">0</span></div>
+</div>
+
+<!-- BADGE BAR -->
+<div id="badge-bar">
+  <span style="color:rgba(255,255,255,0.3);font-size:0.8rem;">🏆 Earn badges as you go!</span>
+</div>
+
+<!-- OVERLAY -->
+<div id="overlay">
+  <div id="overlay-box">
+    <div id="overlay-emoji">🎉</div>
+    <div id="overlay-title">Well done!</div>
+    <div id="overlay-msg"></div>
+    <button class="btn btn-primary" id="overlay-close">Continue →</button>
+  </div>
+</div>
+
+<div id="main-container">
+
+<!-- ===== SLIDE 1: TITLE ===== -->
+<div class="slide active" id="slide-1">
+  <div class="hero">
+    <img src="https://images.unsplash.com/photo-1571752726703-5e7d1f6a986d?w=1200&q=80"
+         alt="Aquarium"
+         onerror="this.src='https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1200&q=80'">
+    <div class="hero-overlay">
+      <h1>🐠 Let's Go to the Aquarium!</h1>
+      <p>すいぞくかんへ いこう！</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="slide-header">
+      <h2>Today's Theme Word</h2><p>今日のテーマ</p>
+    </div>
+    <div style="text-align:center;padding:16px 0;">
+      <div style="font-size:3.5rem;margin-bottom:10px;">👀</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:var(--yellow);margin-bottom:8px;">"SEE"</div>
+      <div style="font-size:1.1rem;color:var(--aqua);margin-bottom:6px;">みる・みつける</div>
+      <div style="color:var(--white);opacity:0.8;font-size:0.95rem;">
+        <em>"I can <span class="hl-see">see</span> a big fish!"</em><br>
+        <span style="font-size:0.85rem;color:var(--aqua);">おおきいさかなが みえるよ！</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px;">
+      <span class="tag tag-vocab">🐠 Animals</span>
+      <span class="tag tag-speak">🗣 Speaking</span>
+      <span class="tag tag-game">🎮 Games × 3</span>
+      <span class="tag tag-listen">👂 Listening</span>
+    </div>
+  </div>
+  <div class="btn-center">
+    <button class="btn btn-primary btn-ripple" id="start-btn" style="font-size:1.2rem;padding:16px 40px;">
+      🐟 Let's Start! はじめよう！
+    </button>
+  </div>
+</div>
+
+<!-- ===== SLIDE 2: WHAT IS AN AQUARIUM? ===== -->
+<div class="slide" id="slide-2">
+  <div class="slide-header">
+    <div class="slide-number">2</div>
+    <h2>🏛 What is an Aquarium?</h2><p>すいぞくかんって なに？</p>
+  </div>
+  <img class="slide-img"
+       src="https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1200&q=80"
+       alt="Aquarium large tank"
+       onerror="this.src='https://images.unsplash.com/photo-1545671913-b89ac1b4ac10?w=1200&q=80'">
+  <div class="card">
+    <p style="font-size:1.05rem;line-height:1.8;color:var(--white);">
+      An <strong style="color:var(--cyan)">aquarium</strong> is a place where you can <span class="hl-see">see</span> sea animals! 🐋<br>
+      <span style="color:var(--aqua);font-size:0.9rem;">すいぞくかんは うみの いきものを みることができる ばしょです！</span>
+    </p>
+    <div class="fish-fact">You can <span class="hl-see">see</span> fish, dolphins, penguins and more!</div>
+  </div>
+  <div class="card" style="background:linear-gradient(135deg,rgba(0,180,216,0.1),rgba(139,92,246,0.1));">
+    <div style="font-size:1.1rem;font-weight:800;color:var(--yellow);margin-bottom:10px;">🗣 Key Phrase</div>
+    <div style="font-size:1.3rem;font-weight:800;color:var(--cyan);margin-bottom:6px;">"I can see a ___!"</div>
+    <div style="color:var(--aqua);font-size:0.9rem;">「___が みえるよ！」</div>
+    <div class="btn-center" style="margin-top:12px;">
+      <button class="btn btn-green btn-sm" onclick="speak('I can see a fish!')">🔊 Listen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 3: VOCAB - ANIMALS ===== -->
+<div class="slide" id="slide-3">
+  <div class="slide-header">
+    <div class="slide-number">3</div>
+    <h2>🐟 Animal Words</h2><p>タップして きこう！</p>
+  </div>
+  <div id="vocab-grid-animals" class="vocab-grid"></div>
+  <div class="fish-fact" style="margin-top:16px;">Tap each card to hear the word!</div>
+</div>
+
+<!-- ===== SLIDE 4: LISTEN & REPEAT ===== -->
+<div class="slide" id="slide-4">
+  <div class="slide-header">
+    <div class="slide-number">4</div>
+    <h2>👂 Listen &amp; Repeat</h2><p>きいて・まねして！</p>
+  </div>
+  <img class="slide-img"
+       src="https://images.unsplash.com/photo-1545671913-b89ac1b4ac10?w=1200&q=80"
+       alt="Colorful fish"
+       onerror="this.src='https://images.unsplash.com/photo-1497206365907-f5e630693df0?w=1200&q=80'">
+  <div id="listen-list-wrap" class="listen-list"></div>
+</div>
+
+<!-- ===== SLIDE 5: KEY PHRASES ===== -->
+<div class="slide" id="slide-5">
+  <div class="slide-header">
+    <div class="slide-number">5</div>
+    <h2>💬 Key Phrases</h2><p>フレーズを おぼえよう！</p>
+  </div>
+  <div id="phrase-list"></div>
+  <div class="fish-fact">Tap any phrase to hear it!</div>
+</div>
+
+<!-- ===== SLIDE 6: MORE WORDS ===== -->
+<div class="slide" id="slide-6">
+  <div class="slide-header">
+    <div class="slide-number">6</div>
+    <h2>🪼 More Words!</h2><p>もっと ことばを おぼえよう！</p>
+  </div>
+  <img class="slide-img"
+       src="https://images.unsplash.com/photo-1497206365907-f5e630693df0?w=1200&q=80"
+       alt="Jellyfish"
+       onerror="this.src='https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=1200&q=80'">
+  <div id="vocab-grid-extra" class="vocab-grid"></div>
+</div>
+
+<!-- ===== SLIDE 7: TYPING ===== -->
+<div class="slide" id="slide-7">
+  <div class="slide-header">
+    <div class="slide-number">7</div>
+    <h2>⌨️ Typing Challenge</h2><p>ことばを タイプしよう！</p>
+  </div>
+  <div class="card">
+    <div id="typing-area">
+      <div id="typing-progress-dots"></div>
+      <div id="typing-prompt">Loading...</div>
+      <div id="typing-ja"></div>
+      <div class="key-hint" id="key-hint"></div>
+      <input type="text" id="typing-input" placeholder="Type here!" autocomplete="off" autocorrect="off" spellcheck="false">
+      <div id="typing-feedback"></div>
+      <div id="streak-display"></div>
+      <div id="typing-score">Score: 0 / 0</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 8: MEMORY MATCH ===== -->
+<div class="slide" id="slide-8">
+  <div class="slide-header">
+    <div class="slide-number">8</div>
+    <h2>🃏 Memory Match!</h2><p>ペアを みつけよう！</p>
+  </div>
+  <div class="card">
+    <div id="match-status">Find all the pairs! ペアを みつけてね！🔍</div>
+    <div id="match-grid"></div>
+  </div>
+  <div class="fish-fact">Tap 2 cards to flip! カードを 2まい えらんでね！</div>
+</div>
+
+<!-- ===== SLIDE 9: ROLE PLAY A ===== -->
+<div class="slide" id="slide-9">
+  <div class="slide-header">
+    <div class="slide-number">9</div>
+    <h2>🎭 Role Play – Scene 1</h2><p>かいわれんしゅう！</p>
+  </div>
+  <div class="card">
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:1.4rem;">👦</div>
+        <span style="font-size:0.85rem;color:var(--aqua);">A: You</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:1.4rem;">👧</div>
+        <span style="font-size:0.85rem;color:var(--aqua);">B: Friend</span>
+      </div>
+    </div>
+    <div id="roleplay-a" class="chat-scene"></div>
+    <div class="chat-controls" id="rp-a-controls"></div>
+  </div>
+  <div class="fish-fact">Tap the avatar or bubble to hear!</div>
+</div>
+
+<!-- ===== SLIDE 10: ROLE PLAY B ===== -->
+<div class="slide" id="slide-10">
+  <div class="slide-header">
+    <div class="slide-number">10</div>
+    <h2>🎭 Role Play – Scene 2</h2><p>もっと かいわ れんしゅうしよう！</p>
+  </div>
+  <img class="slide-img"
+       src="https://images.unsplash.com/photo-1560275619-4cc5fa59d3ae?w=1200&q=80"
+       alt="Penguin"
+       onerror="this.src='https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=1200&q=80'">
+  <div class="card">
+    <div id="roleplay-b" class="chat-scene"></div>
+    <div class="chat-controls" id="rp-b-controls"></div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 11: WHO AM I? ===== -->
+<div class="slide" id="slide-11">
+  <div class="slide-header">
+    <div class="slide-number">11</div>
+    <h2>🤔 Who Am I?</h2><p>ヒントで あてよう！</p>
+  </div>
+  <div class="card">
+    <div id="whoami-clue-box">
+      <div id="whoami-clues"></div>
+      <button class="btn btn-sm btn-primary" id="next-clue-btn" style="margin-top:12px;">
+        Next Clue 🔍 つぎのヒント
+      </button>
+    </div>
+    <div id="whoami-options"></div>
+    <div id="whoami-score">Question: 1 / 5</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 12: FIND-IT! ===== -->
+<div class="slide" id="slide-12">
+  <div class="slide-header">
+    <div class="slide-number">12</div>
+    <h2>⚡ Find It! Speed Game</h2><p>はやく みつけろ！</p>
+  </div>
+  <div class="card">
+    <div id="findit-info">
+      <span>Round: <strong id="fi-round">1</strong>/8</span>
+      <span>Score: <strong id="fi-score">0</strong></span>
+    </div>
+    <div id="findit-timer-wrap"><div id="findit-timer-bar"></div></div>
+    <div id="findit-display">
+      <div id="findit-target">Loading…</div>
+      <div id="findit-target-ja" style="font-size:0.85rem;color:var(--aqua);margin-bottom:10px;"></div>
+    </div>
+    <div id="findit-grid"></div>
+    <div id="findit-feedback" style="text-align:center;margin-top:10px;font-weight:700;min-height:24px;"></div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 13: FEEDING TIME! (新ゲーム) ===== -->
+<div class="slide" id="slide-13">
+  <div class="slide-header">
+    <div class="slide-number">13</div>
+    <h2>🍤 Feeding Time!</h2>
+    <p>ただしい えさを タップして さかなを たべさせよう！</p>
+  </div>
+  <div class="card">
+    <div id="feed-status">
+      <span>Round: <strong id="feed-round">1</strong>/8</span>
+      <span>Score: <strong id="feed-score-num">0</strong></span>
+    </div>
+    <div id="feed-score-bar"><div id="feed-score-fill" style="width:0%"></div></div>
+    <div id="feed-word-display">
+      <div id="feed-word-en">fish</div>
+      <div id="feed-word-ja">さかなに えさをあげよう！</div>
+    </div>
+    <div id="feed-feedback"></div>
+    <div id="feed-scene">
+      <div id="feed-bubbles-layer"></div>
+      <div id="fish-row"></div>
+    </div>
+  </div>
+  <div class="fish-fact">Drop the right food to the fish! ただしい えさを タップしてね！</div>
+</div>
+
+<!-- ===== SLIDE 14: MIKKE! HIDDEN OBJECT ===== -->
+<div class="slide" id="slide-14">
+  <div class="slide-header">
+    <div class="slide-number">14</div>
+    <h2>🔍 Where Is It? みつけてみよう！</h2>
+    <p>かくれた いきものを さがそう！</p>
+  </div>
+  <div class="card">
+    <div id="mikke-room-info">
+      <div id="mikke-room-name">🐠 Fish Tank Room</div>
+      <div id="mikke-timer-display">⏱ 60s</div>
+    </div>
+    <div id="mikke-timer-wrap"><div id="mikke-timer-bar"></div></div>
+    <div id="mikke-target-display"></div>
+    <div id="mikke-wrapper">
+      <img id="mikke-img" src="" alt="Scene">
+      <div id="mikke-overlay"></div>
+    </div>
+    <div id="mikke-found-count">Found: 0 / 5</div>
+    <button id="mikke-hint-btn">💡 Hint! ヒントをみる</button>
+  </div>
+</div>
+
+<!-- ===== SLIDE 15: FISH QUIZ ===== -->
+<div class="slide" id="slide-15">
+  <div class="slide-header">
+    <div class="slide-number">15</div>
+    <h2>🐡 Fish Quiz!</h2><p>こたえを えらんでね！</p>
+  </div>
+  <div class="card">
+    <div id="fishquiz-prog"></div>
+    <img id="fishquiz-img"
+         src="https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=1200&q=80"
+         alt="Fish quiz">
+    <div id="fishquiz-question">Loading...</div>
+    <div id="fishquiz-options"></div>
+    <div id="fishquiz-score">Score: 0 / 0</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 16: WORD SCRAMBLE ===== -->
+<div class="slide" id="slide-16">
+  <div class="slide-header">
+    <div class="slide-number">16</div>
+    <h2>🔤 Word Scramble!</h2><p>もじを ならべかえよう！</p>
+  </div>
+  <div class="card">
+    <div id="scramble-info" style="text-align:center;margin-bottom:12px;color:var(--aqua);font-size:0.85rem;">Word 1/6 | Score: 0</div>
+    <div id="scramble-emoji" style="text-align:center;font-size:3rem;margin-bottom:8px;"></div>
+    <div id="scramble-hint"></div>
+    <div id="scramble-word"></div>
+    <div id="scramble-answer"></div>
+    <div id="scramble-options"></div>
+    <div id="scramble-feedback"></div>
+    <div class="btn-center" style="margin-top:10px;">
+      <button class="btn btn-sm btn-coral" id="scramble-clear-btn">↩ Clear</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 17: REVIEW ===== -->
+<div class="slide" id="slide-17">
+  <div class="slide-header">
+    <div class="slide-number">17</div>
+    <h2>📝 Review Time!</h2><p>おさらいしよう！</p>
+  </div>
+  <div class="review-grid" id="review-grid"></div>
+</div>
+
+<!-- ===== SLIDE 18: SUMMARY ===== -->
+<div class="slide" id="slide-18">
+  <div class="slide-header">
+    <div class="slide-number">18</div>
+    <h2>🎊 You Did It!</h2><p>おつかれさま！</p>
+  </div>
+  <div class="summary-score-display">
+    <div class="final-score" id="final-score">0 pts</div>
+    <div class="final-msg" id="final-msg">Great work!</div>
+  </div>
+  <div class="summary-grid" id="summary-grid"></div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+    <button class="btn btn-primary" id="restart-btn">🔄 Play Again!</button>
+    <button class="btn btn-yellow" onclick="speak('I can see a big fish! I love the aquarium!')">🔊 Read All</button>
+  </div>
+</div>
+
+</div><!-- /main-container -->
+
+<!-- NAV BAR -->
+<div id="nav-btns">
+  <button class="btn btn-coral btn-sm" id="back-btn">◀ Back</button>
+  <div id="nav-dots"></div>
+  <button class="btn btn-primary btn-sm" id="next-btn">Next ▶</button>
+</div>
+
+<script>
+/* ================================================================
+   CONSTANTS & STATE
+================================================================ */
+const TOTAL_SLIDES = 18;
+let currentSlide = 1;
+let score = 0;
+let earnedBadges = [];
+
+/* ================================================================
+   DATA
+================================================================ */
+const ANIMAL_VOCAB = [
+  { emoji:'🐟', en:'fish',      ja:'さかな',   hint:'swims in water' },
+  { emoji:'🐬', en:'dolphin',   ja:'イルカ',   hint:'very smart!' },
+  { emoji:'🐧', en:'penguin',   ja:'ペンギン', hint:'can\'t fly but swims' },
+  { emoji:'🦈', en:'shark',     ja:'サメ',     hint:'big teeth!' },
+  { emoji:'🐙', en:'octopus',   ja:'タコ',     hint:'8 arms' },
+  { emoji:'🐢', en:'turtle',    ja:'カメ',     hint:'has a shell' },
+  { emoji:'🪼', en:'jellyfish', ja:'クラゲ',   hint:'no brain!' },
+  { emoji:'🦞', en:'lobster',   ja:'エビ',     hint:'red and tasty' },
+];
+
+const EXTRA_VOCAB = [
+  { emoji:'🌊', en:'ocean',    ja:'うみ',        hint:'very big and blue' },
+  { emoji:'🪸', en:'coral',    ja:'さんご',      hint:'colorful underwater' },
+  { emoji:'🔍', en:'find',     ja:'みつける',    hint:'Look carefully!' },
+  { emoji:'👀', en:'see',      ja:'みる',        hint:'use your eyes' },
+  { emoji:'🏛',  en:'aquarium', ja:'すいぞくかん', hint:'place for sea animals' },
+  { emoji:'💧', en:'water',    ja:'みず',        hint:'fish live here' },
+];
+
+const LISTEN_ITEMS = [
+  { icon:'🐟', en:'I can see a fish.',        ja:'さかなが みえるよ。' },
+  { icon:'🐬', en:'Look! A dolphin!',          ja:'みて！ イルカだ！' },
+  { icon:'🐧', en:'The penguin is cute.',      ja:'ペンギンが かわいい。' },
+  { icon:'🦈', en:'I found a big shark!',      ja:'おおきい サメを みつけた！' },
+  { icon:'🐙', en:'Can you see the octopus?', ja:'タコが みえる？' },
+  { icon:'🌊', en:'The ocean is beautiful.',   ja:'うみが きれいだね。' },
+];
+
+const PHRASES = [
+  { en:'I can see a ___!',   ja:'___が みえるよ！',   ex:'I can see a dolphin!' },
+  { en:'Look at that ___!',  ja:'あの___を みて！',    ex:'Look at that big fish!' },
+  { en:'I found a ___!',     ja:'___を みつけた！',    ex:'I found a jellyfish!' },
+  { en:'Where is the ___?',  ja:'___は どこ？',        ex:'Where is the turtle?' },
+  { en:'It\'s so cool!',     ja:'すごい！かっこいい！', ex:'The shark is so cool!' },
+];
+
+const ROLEPLAY_A = [
+  { side:'left',  avatar:'👦', name:'A', en:'Let\'s go to the aquarium!',    ja:'すいぞくかんへ いこうよ！' },
+  { side:'right', avatar:'👧', name:'B', en:'OK! I love the aquarium!',      ja:'うん！ だいすき！' },
+  { side:'left',  avatar:'👦', name:'A', en:'Look! I can see a big shark!',  ja:'みて！ おおきいサメが みえるよ！' },
+  { side:'right', avatar:'👧', name:'B', en:'Wow! It is so cool!',            ja:'わあ！ すごい！' },
+  { side:'left',  avatar:'👦', name:'A', en:'I can see dolphins too!',       ja:'イルカも みえるよ！' },
+  { side:'right', avatar:'👧', name:'B', en:'This is the best day ever!',    ja:'さいこうの いちにちだね！' },
+];
+
+const ROLEPLAY_B = [
+  { side:'left',  avatar:'👦', name:'A', en:'Where is the penguin?',         ja:'ペンギンは どこ？' },
+  { side:'right', avatar:'👧', name:'B', en:'Look over there! I found it!',  ja:'あそこ！ みつけた！' },
+  { side:'left',  avatar:'👦', name:'A', en:'Oh! The penguin is swimming!',  ja:'あ！ ペンギンが およいでいる！' },
+  { side:'right', avatar:'👧', name:'B', en:'Can you see the turtle?',       ja:'カメが みえる？' },
+  { side:'left',  avatar:'👦', name:'A', en:'Yes! I can see a big turtle!',  ja:'うん！ おおきいカメが みえるよ！' },
+  { side:'right', avatar:'👧', name:'B', en:'Let us take a photo!',           ja:'しゃしんを とろう！' },
+];
+
+const WHOAMI_DATA = [
+  { clues:['I live in the ocean.\nわたしは うみに すんでいます。','I have 8 arms.\nうでが 8ほん あります。','I can change color!\nいろを かえられます！'], answer:'octopus', options:['🐟 fish','🐙 octopus','🐢 turtle','🦈 shark'] },
+  { clues:['I am black and white.\nしろくろです。','I cannot fly.\nとべません。','I swim very well!\nすいえいが とくいです！'], answer:'penguin', options:['🐦 bird','🦆 duck','🐧 penguin','🦢 swan'] },
+  { clues:['I have a shell.\nこうらが あります。','I am slow on land.\nりくでは おそいです。','I can swim well.\nじょうずに およげます。'], answer:'turtle', options:['🐙 octopus','🦞 lobster','🐠 clownfish','🐢 turtle'] },
+  { clues:['I am very big.\nとても おおきいです。','I have big teeth.\nおおきい きばが あります。','People are scared of me!\nみんな こわがります！'], answer:'shark', options:['🐬 dolphin','🦈 shark','🐙 octopus','🐢 turtle'] },
+  { clues:['I am soft like jelly.\nゼリーみたいに やわらかいです。','I glow in the dark!\nくらやみで ひかります！','I have no brain.\nのうが ありません。'], answer:'jellyfish', options:['🪼 jellyfish','🦑 squid','🐙 octopus','🌸 flower'] },
+];
+
+const FINDIT_DATA = [
+  { target:'fish',      targetJa:'さかな',   emoji:'🐟', options:[{emoji:'🐟',word:'fish'},{emoji:'🐬',word:'dolphin'},{emoji:'🐧',word:'penguin'}] },
+  { target:'shark',     targetJa:'サメ',     emoji:'🦈', options:[{emoji:'🦈',word:'shark'},{emoji:'🐙',word:'octopus'},{emoji:'🐢',word:'turtle'}] },
+  { target:'penguin',   targetJa:'ペンギン', emoji:'🐧', options:[{emoji:'🐧',word:'penguin'},{emoji:'🐟',word:'fish'},{emoji:'🦞',word:'lobster'}] },
+  { target:'jellyfish', targetJa:'クラゲ',   emoji:'🪼', options:[{emoji:'🪼',word:'jellyfish'},{emoji:'🐬',word:'dolphin'},{emoji:'🦈',word:'shark'}] },
+  { target:'octopus',   targetJa:'タコ',     emoji:'🐙', options:[{emoji:'🐙',word:'octopus'},{emoji:'🐧',word:'penguin'},{emoji:'🐟',word:'fish'}] },
+  { target:'turtle',    targetJa:'カメ',     emoji:'🐢', options:[{emoji:'🐢',word:'turtle'},{emoji:'🦈',word:'shark'},{emoji:'🪼',word:'jellyfish'}] },
+  { target:'ocean',     targetJa:'うみ',     emoji:'🌊', options:[{emoji:'🌊',word:'ocean'},{emoji:'💧',word:'water'},{emoji:'🐙',word:'octopus'}] },
+  { target:'coral',     targetJa:'さんご',   emoji:'🪸', options:[{emoji:'🪸',word:'coral'},{emoji:'🐢',word:'turtle'},{emoji:'🐬',word:'dolphin'}] },
+];
+
+/* ---- FEEDING TIME DATA ---- */
+const FEED_ROUNDS = [
+  { fish:'🐟', fishJa:'さかな', fish_en:'fish',     correctFood:'🐠', correctLabel:'fish food', wrongFoods:['🍕','🍦','🍎'] },
+  { fish:'🐧', fishJa:'ペンギン', fish_en:'penguin', correctFood:'🐟', correctLabel:'fish',      wrongFoods:['🍔','🎂','🌽'] },
+  { fish:'🦈', fishJa:'サメ',    fish_en:'shark',    correctFood:'🐠', correctLabel:'small fish', wrongFoods:['🍩','🍭','🥐'] },
+  { fish:'🐢', fishJa:'カメ',    fish_en:'turtle',   correctFood:'🥬', correctLabel:'seaweed',   wrongFoods:['🍕','🍦','🍔'] },
+  { fish:'🐙', fishJa:'タコ',    fish_en:'octopus',  correctFood:'🦞', correctLabel:'shrimp',    wrongFoods:['🍎','🎂','🍭'] },
+  { fish:'🪼', fishJa:'クラゲ',  fish_en:'jellyfish',correctFood:'🦐', correctLabel:'krill',     wrongFoods:['🍕','🌽','🍔'] },
+  { fish:'🐬', fishJa:'イルカ',  fish_en:'dolphin',  correctFood:'🐟', correctLabel:'fish',      wrongFoods:['🍩','🍦','🎂'] },
+  { fish:'🦞', fishJa:'エビ',    fish_en:'lobster',  correctFood:'🌿', correctLabel:'plants',    wrongFoods:['🍕','🍎','🍭'] },
+];
+
+const MIKKE_ROOMS = [
+  {
+    name:'🐠 Fish Tank Room',
+    img:'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=1200&q=80',
+    fallback:'https://images.unsplash.com/photo-1544552866-d3ed42536cfd?w=1200&q=80',
+    targets:[
+      { emoji:'🐟', word:'fish',    ja:'さかな',  x:12, y:22 },
+      { emoji:'🪸', word:'coral',   ja:'さんご',  x:72, y:58 },
+      { emoji:'🐙', word:'octopus', ja:'タコ',    x:42, y:70 },
+      { emoji:'⭐', word:'star',    ja:'ヒトデ',  x:80, y:28 },
+      { emoji:'🫧', word:'bubble',  ja:'あわ',    x:28, y:42 },
+    ]
+  },
+  {
+    name:'🐧 Penguin Zone',
+    img:'https://images.unsplash.com/photo-1560275619-4cc5fa59d3ae?w=1200&q=80',
+    fallback:'https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=1200&q=80',
+    targets:[
+      { emoji:'🐧', word:'penguin', ja:'ペンギン', x:15, y:18 },
+      { emoji:'🐠', word:'fish',    ja:'さかな',   x:62, y:32 },
+      { emoji:'💧', word:'water',   ja:'みず',     x:38, y:62 },
+      { emoji:'🪨', word:'rock',    ja:'いわ',     x:76, y:68 },
+      { emoji:'❄️', word:'ice',     ja:'こおり',   x:52, y:12 },
+    ]
+  },
+  {
+    name:'🦈 Shark Tunnel',
+    img:'https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=1200&q=80',
+    fallback:'https://images.unsplash.com/photo-1571752726703-5e7d1f6a986d?w=1200&q=80',
+    targets:[
+      { emoji:'🦈', word:'shark',    ja:'サメ',    x:22, y:18 },
+      { emoji:'🐢', word:'turtle',   ja:'カメ',    x:68, y:22 },
+      { emoji:'🐬', word:'dolphin',  ja:'イルカ',  x:42, y:52 },
+      { emoji:'🪼', word:'jellyfish',ja:'クラゲ',  x:78, y:62 },
+      { emoji:'🔦', word:'light',    ja:'ライト',  x:12, y:68 },
+    ]
+  }
+];
+
+const FISHQUIZ_DATA = [
+  { img:'https://images.unsplash.com/photo-1571752726703-5e7d1f6a986d?w=800&q=80', q:'Which animal has 8 arms?\n（うでが 8ほん あるのは？）', answer:'🐙 Octopus', options:['🐟 Fish','🐬 Dolphin','🐙 Octopus','🦈 Shark'] },
+  { img:'https://images.unsplash.com/photo-1560275619-4cc5fa59d3ae?w=800&q=80',    q:'This animal can swim but cannot fly!\n（およぐけど とべない いきものは？）', answer:'🐧 Penguin', options:['🦅 Eagle','🐧 Penguin','🦆 Duck','🐦 Bird'] },
+  { img:'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=800&q=80', q:'Which animal has a shell?\n（こうらが あるのは？）', answer:'🐢 Turtle', options:['🐙 Octopus','🐬 Dolphin','🐢 Turtle','🦈 Shark'] },
+  { img:'https://images.unsplash.com/photo-1545671913-b89ac1b4ac10?w=800&q=80',    q:'"I can see a ___!" What word fits?\n（「みえるよ！」に はいるのは？）', answer:'🐟 fish', options:['🌳 tree','🐟 fish','✈️ airplane','🚗 car'] },
+  { img:'https://images.unsplash.com/photo-1497206365907-f5e630693df0?w=800&q=80', q:'Which word means "みつける"?\n（「みつける」は えいごで？）', answer:'Find', options:['Swim','Eat','Find','Sleep'] },
+  { img:'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=800&q=80', q:'What is this place called?\n（このばしょは なに？）', answer:'Aquarium', options:['Library','Museum','Aquarium','School'] },
+];
+
+const SCRAMBLE_DATA = [
+  { word:'FISH',    emoji:'🐟', ja:'さかな',   hint:'swims in water' },
+  { word:'SHARK',   emoji:'🦈', ja:'サメ',     hint:'big teeth!' },
+  { word:'TURTLE',  emoji:'🐢', ja:'カメ',     hint:'has a shell' },
+  { word:'OCEAN',   emoji:'🌊', ja:'うみ',     hint:'very big and blue' },
+  { word:'CORAL',   emoji:'🪸', ja:'さんご',   hint:'colorful underwater' },
+  { word:'DOLPHIN', emoji:'🐬', ja:'イルカ',   hint:'very smart animal' },
+];
+
+const REVIEW_DATA = [
+  { emoji:'🐟', en:'fish',      ja:'さかな',   ex:'I can see a fish!' },
+  { emoji:'🐬', en:'dolphin',   ja:'イルカ',   ex:'Look at that dolphin!' },
+  { emoji:'🐧', en:'penguin',   ja:'ペンギン', ex:'The penguin is cute.' },
+  { emoji:'🦈', en:'shark',     ja:'サメ',     ex:'I found a big shark!' },
+  { emoji:'🐙', en:'octopus',   ja:'タコ',     ex:'Can you see the octopus?' },
+  { emoji:'🐢', en:'turtle',    ja:'カメ',     ex:'The turtle is slow.' },
+  { emoji:'🪼', en:'jellyfish', ja:'クラゲ',   ex:'I found a jellyfish!' },
+  { emoji:'🌊', en:'ocean',     ja:'うみ',     ex:'The ocean is beautiful.' },
+];
+
+/* ================================================================
+   SPEECH
+================================================================ */
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.85; u.pitch = 1.1;
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = ['Samantha','Karen','Google US English','Microsoft Zira'];
+  for (const p of preferred) {
+    const v = voices.find(x => x.name.includes(p));
+    if (v) { u.voice = v; break; }
+  }
+  window.speechSynthesis.speak(u);
+}
+if (window.speechSynthesis) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = () => {};
+}
+
+/* ================================================================
+   SCORE & BADGES
+================================================================ */
+function addScore(pts) {
+  score += pts;
+  document.getElementById('score-num').textContent = score;
+  showFloatScore(pts);
+}
+function showFloatScore(pts) {
+  const el = document.createElement('div');
+  el.textContent = `+${pts}`;
+  el.style.cssText = `position:fixed;font-weight:800;font-size:1.3rem;color:var(--yellow);
+    z-index:500;left:50%;top:55%;transform:translateX(-50%);pointer-events:none;
+    animation:ft 1s ease forwards;text-shadow:0 0 10px rgba(255,209,102,0.8);`;
+  document.body.appendChild(el);
+  const s = document.createElement('style');
+  s.textContent = `@keyframes ft{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-60px)}}`;
+  document.head.appendChild(s);
+  setTimeout(() => { el.remove(); s.remove(); }, 1100);
+}
+
+function awardBadge(icon, name) {
+  if (earnedBadges.includes(name)) return;
+  earnedBadges.push(name);
+  const bar = document.getElementById('badge-bar');
+  const b = document.createElement('span');
+  b.className = 'badge';
+  b.textContent = `${icon} ${name}`;
+  bar.appendChild(b);
+  showOverlay(icon, name, 'You earned a new badge!\nあたらしい バッジを ゲット！🎉');
+  launchConfetti();
+}
+
+/* ================================================================
+   CONFETTI
+================================================================ */
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = innerWidth; canvas.height = innerHeight;
+  const colors = ['#00b4d8','#ffd166','#ff6b6b','#06d6a0','#8b5cf6','#f472b6'];
+  const particles = Array.from({length:100}, () => ({
+    x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height,
+    w: Math.random()*10+5, h: Math.random()*6+3,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    r: Math.random()*Math.PI*2, dr: (Math.random()-0.5)*0.2,
+    vy: Math.random()*3+2, vx: (Math.random()-0.5)*2,
+  }));
+  let raf;
+  (function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive = false;
+    for (const p of particles) {
+      p.x+=p.vx; p.y+=p.vy; p.r+=p.dr;
+      if (p.y < canvas.height+20) alive=true;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r);
+      ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    }
+    if(alive) raf=requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  })();
+  setTimeout(() => { cancelAnimationFrame(raf); ctx.clearRect(0,0,canvas.width,canvas.height); }, 4500);
+}
+
+/* ================================================================
+   OVERLAY
+================================================================ */
+let overlayCallback = null;
+function showOverlay(emoji, title, msg, cb) {
+  document.getElementById('overlay-emoji').textContent = emoji;
+  document.getElementById('overlay-title').textContent = title;
+  document.getElementById('overlay-msg').textContent   = msg;
+  document.getElementById('overlay').classList.add('show');
+  overlayCallback = cb || null;
+}
+function hideOverlay() {
+  document.getElementById('overlay').classList.remove('show');
+  if (overlayCallback) { overlayCallback(); overlayCallback = null; }
+}
+
+/* ================================================================
+   BUBBLES
+================================================================ */
+function createBubbles() {
+  const bg = document.getElementById('bubbles-bg');
+  for (let i=0; i<18; i++) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const sz = Math.random()*30+10;
+    b.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;
+      animation-duration:${Math.random()*10+8}s;animation-delay:${Math.random()*8}s;
+      opacity:${Math.random()*0.4+0.1};`;
+    bg.appendChild(b);
+  }
+}
+
+/* ================================================================
+   NAVIGATION
+================================================================ */
+function updateProgress() {
+  const pct = ((currentSlide-1)/(TOTAL_SLIDES-1))*100;
+  document.getElementById('progress-bar').style.width = pct+'%';
+  document.querySelectorAll('.nav-dot').forEach((d,i) => {
+    d.classList.toggle('active', i===currentSlide-1);
+    d.classList.toggle('done',   i< currentSlide-1);
+  });
+}
+function goSlide(n) {
+  if (n<1||n>TOTAL_SLIDES) return;
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById(`slide-${n}`).classList.add('active');
+  currentSlide=n;
+  updateProgress();
+  onSlideEnter(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function navigate(dir) { goSlide(currentSlide+dir); }
+
+function buildNavDots() {
+  const wrap = document.getElementById('nav-dots');
+  for (let i=1;i<=TOTAL_SLIDES;i++) {
+    const d = document.createElement('div');
+    d.className='nav-dot'; d.title=`Slide ${i}`;
+    const s=i; d.addEventListener('click',()=>goSlide(s));
+    wrap.appendChild(d);
+  }
+}
+
+/* ================================================================
+   SLIDE ENTER ROUTER
+================================================================ */
+function onSlideEnter(n) {
+  const map = {
+    3: buildAnimalVocab,
+    4: buildListenList,
+    5: buildPhrases,
+    6: buildExtraVocab,
+    7: initTyping,
+    8: initMatch,
+    9: buildRoleplayA,
+    10: buildRoleplayB,
+    11: initWhoami,
+    12: initFindit,
+    13: initFeedingTime,
+    14: initMikke,
+    15: initFishquiz,
+    16: initScramble,
+    17: buildReview,
+    18: buildSummary,
+  };
+  if (map[n]) map[n]();
+}
+
+/* ================================================================
+   VOCAB
+================================================================ */
+function buildVocabGrid(id, data) {
+  const el=document.getElementById(id);
+  if (!el||el.dataset.built) return;
+  el.dataset.built='1';
+  data.forEach(v=>{
+    const c=document.createElement('div'); c.className='vocab-card';
+    c.innerHTML=`<span class="vocab-emoji">${v.emoji}</span>
+      <div class="vocab-en">${v.en}</div>
+      <div class="vocab-ja">${v.ja}</div>
+      <div class="vocab-hint">${v.hint}</div>`;
+    c.addEventListener('click',()=>{
+      speak(v.en);
+      c.style.background='linear-gradient(135deg,rgba(0,180,216,0.35),rgba(139,92,246,0.35))';
+      setTimeout(()=>c.style.background='',600);
+    });
+    el.appendChild(c);
+  });
+}
+const buildAnimalVocab = ()=>buildVocabGrid('vocab-grid-animals',ANIMAL_VOCAB);
+const buildExtraVocab  = ()=>buildVocabGrid('vocab-grid-extra',  EXTRA_VOCAB);
+
+/* ================================================================
+   LISTEN LIST
+================================================================ */
+function buildListenList() {
+  const el=document.getElementById('listen-list-wrap');
+  if (!el||el.dataset.built) return; el.dataset.built='1';
+  LISTEN_ITEMS.forEach(item=>{
+    const d=document.createElement('div'); d.className='listen-item';
+    d.innerHTML=`<div class="listen-icon">${item.icon}</div>
+      <div><div class="listen-en">${item.en}</div><div class="listen-ja">${item.ja}</div></div>
+      <div class="listen-play">🔊</div>`;
+    d.addEventListener('click',()=>speak(item.en));
+    el.appendChild(d);
+  });
+}
+
+/* ================================================================
+   PHRASES
+================================================================ */
+function buildPhrases() {
+  const el=document.getElementById('phrase-list');
+  if (!el||el.dataset.built) return; el.dataset.built='1';
+  PHRASES.forEach(p=>{
+    const d=document.createElement('div'); d.className='phrase-box';
+    d.innerHTML=`<span class="phrase-speaker">🔊</span>
+      <div class="phrase-en">${p.en}</div>
+      <div class="phrase-ja">${p.ja}</div>
+      <div class="phrase-ex"><em>${p.ex}</em></div>`;
+    d.addEventListener('click',()=>speak(p.ex));
+    el.appendChild(d);
+  });
+}
+
+/* ================================================================
+   TYPING
+================================================================ */
+const TYPING_DATA=[
+  {word:'fish',    ja:'さかな',   img:'🐟'},
+  {word:'dolphin', ja:'イルカ',   img:'🐬'},
+  {word:'penguin', ja:'ペンギン', img:'🐧'},
+  {word:'shark',   ja:'サメ',     img:'🦈'},
+  {word:'octopus', ja:'タコ',     img:'🐙'},
+  {word:'turtle',  ja:'カメ',     img:'🐢'},
+  {word:'jellyfish',ja:'クラゲ',  img:'🪼'},
+  {word:'ocean',   ja:'うみ',     img:'🌊'},
+];
+let typingIdx=0, typingCorrect=0, typingStreak=0;
+function initTyping(){
+  const inp=document.getElementById('typing-input');
+  if(inp.dataset.built) return; inp.dataset.built='1';
+  typingIdx=0; typingCorrect=0; typingStreak=0;
+  buildTypingQ(); inp.addEventListener('input',checkTyping);
+}
+function buildTypingQ(){
+  if(typingIdx>=TYPING_DATA.length){
+    document.getElementById('typing-prompt').textContent='🎉 All done!';
+    document.getElementById('typing-ja').textContent='ぜんぶ おわった！';
+    document.getElementById('typing-input').disabled=true;
+    document.getElementById('key-hint').innerHTML='';
+    if(typingCorrect>=6) awardBadge('⌨️','Typing Star!');
+    return;
+  }
+  const q=TYPING_DATA[typingIdx];
+  document.getElementById('typing-prompt').textContent=`${q.img} What is this?`;
+  document.getElementById('typing-ja').textContent=`${q.ja} → type in English`;
+  const inp=document.getElementById('typing-input');
+  inp.value=''; inp.disabled=false; inp.className=''; inp.focus();
+  document.getElementById('typing-feedback').textContent='';
+  buildKeyHint(q.word); buildTypingDots();
+}
+function buildKeyHint(word){
+  const h=document.getElementById('key-hint'); h.innerHTML='';
+  word.split('').forEach(()=>{
+    const k=document.createElement('div'); k.className='key-letter'; k.textContent='?'; h.appendChild(k);
+  });
+}
+function buildTypingDots(){
+  const w=document.getElementById('typing-progress-dots'); w.innerHTML='';
+  TYPING_DATA.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='t-dot'+(i<typingIdx?' done':'');
+    w.appendChild(d);
+  });
+  document.getElementById('typing-score').textContent=`Score: ${typingCorrect} / ${typingIdx}`;
+}
+function updateKeyHint(typed){
+  document.querySelectorAll('#key-hint .key-letter').forEach((k,i)=>{
+    k.classList.toggle('typed',i<typed.length);
+    k.textContent=i<typed.length?typed[i]:'?';
+  });
+}
+function checkTyping(){
+  const inp=document.getElementById('typing-input');
+  const val=inp.value.trim().toLowerCase();
+  const target=TYPING_DATA[typingIdx].word.toLowerCase();
+  updateKeyHint(val);
+  if(val===target){
+    inp.className='correct';
+    document.getElementById('typing-feedback').innerHTML=`<span style="color:var(--green)">✅ Correct! せいかい！</span>`;
+    typingCorrect++; typingStreak++; addScore(typingStreak>=3?15:10);
+    updateStreak(); speak(target);
+    setTimeout(()=>{typingIdx++;buildTypingQ();},1000);
+  } else if(val.length>=target.length){
+    inp.className='wrong';
+    document.getElementById('typing-feedback').innerHTML=`<span style="color:var(--coral)">❌ Try again!</span>`;
+    typingStreak=0; updateStreak();
+    setTimeout(()=>{inp.value='';inp.className='';document.getElementById('typing-feedback').textContent='';},800);
+  }
+}
+function updateStreak(){
+  const el=document.getElementById('streak-display');
+  el.innerHTML=typingStreak>=3?`<span class="streak-fire">🔥 ${typingStreak} in a row!</span>`:
+               typingStreak>0?`Streak: ${typingStreak} 🌊`:'';
+}
+
+/* ================================================================
+   MEMORY MATCH  ── 完全修正版
+   ・match-card(perspective wrapper) > match-card-inner(rotates)
+     > .match-back(裏面) + .match-front(表面, rotateY180で初期セット)
+   ・backface-visibility:hidden で鏡像反転を防止
+================================================================ */
+const MATCH_PAIRS_DATA=[
+  {id:1,emoji:'🐟',text:'fish'},
+  {id:2,emoji:'🐬',text:'dolphin'},
+  {id:3,emoji:'🐧',text:'penguin'},
+  {id:4,emoji:'🦈',text:'shark'},
+  {id:5,emoji:'🐙',text:'octopus'},
+  {id:6,emoji:'🐢',text:'turtle'},
+  {id:7,emoji:'🪼',text:'jellyfish'},
+  {id:8,emoji:'🌊',text:'ocean'},
+];
+let mFlipped=[],mLocked=false,mFound=0;
+
+function initMatch(){
+  const grid=document.getElementById('match-grid');
+  if(grid.dataset.built) return; grid.dataset.built='1';
+  mFlipped=[]; mLocked=false; mFound=0;
+  // ペアを2枚ずつ作ってシャッフル
+  const cards=shuffle([...MATCH_PAIRS_DATA,...MATCH_PAIRS_DATA]);
+  cards.forEach(card=>{
+    /* ── wrapper (perspective) ── */
+    const wrapper=document.createElement('div');
+    wrapper.className='match-card';
+    wrapper.dataset.id=card.id;
+
+    /* ── inner (回転する) ── */
+    const inner=document.createElement('div');
+    inner.className='match-card-inner';
+
+    /* ── 裏面 ── */
+    const back=document.createElement('div');
+    back.className='match-face match-back';
+    back.textContent='🌊';
+
+    /* ── 表面 ── */
+    const front=document.createElement('div');
+    front.className='match-face match-front';
+    const em=document.createElement('span');
+    em.className='mf-emoji'; em.textContent=card.emoji;
+    const tx=document.createElement('span');
+    tx.className='mf-text'; tx.textContent=card.text;
+    front.appendChild(em); front.appendChild(tx);
+
+    inner.appendChild(back);
+    inner.appendChild(front);
+    wrapper.appendChild(inner);
+
+    wrapper.addEventListener('click',()=>flipCard(wrapper,card));
+    grid.appendChild(wrapper);
+  });
+}
+
+function flipCard(wrapper,card){
+  if(mLocked||wrapper.classList.contains('flipped')||wrapper.classList.contains('matched')) return;
+  wrapper.classList.add('flipped');
+  speak(card.text);
+  mFlipped.push({wrapper,card});
+  if(mFlipped.length===2){ mLocked=true; setTimeout(checkMatch,750); }
+}
+
+function checkMatch(){
+  const [a,b]=mFlipped;
+  if(a.card.id===b.card.id){
+    a.wrapper.classList.add('matched');
+    b.wrapper.classList.add('matched');
+    mFound++; addScore(20);
+    document.getElementById('match-status').textContent=
+      `✅ Found ${mFound} pairs! あと ${8-mFound} ペア！`;
+    if(mFound===8){
+      awardBadge('🃏','Match Master!');
+      document.getElementById('match-status').textContent='🎉 All matched! ぜんぶ みつけた！';
+    }
+  } else {
+    a.wrapper.classList.remove('flipped');
+    b.wrapper.classList.remove('flipped');
+  }
+  mFlipped=[]; mLocked=false;
+}
+
+/* ================================================================
+   ROLE PLAY
+================================================================ */
+function buildRoleplay(containerId,lines,controlsId){
+  const el=document.getElementById(containerId);
+  if(!el||el.dataset.built) return; el.dataset.built='1';
+  lines.forEach((line,i)=>{
+    const div=document.createElement('div');
+    div.className='chat-line'+(line.side==='right'?' right':'');
+    div.style.transitionDelay=`${i*0.15}s`;
+    const av=document.createElement('div'); av.className='chat-avatar';
+    av.textContent=line.avatar; av.addEventListener('click',()=>speak(line.en));
+    const bubble=document.createElement('div'); bubble.className='chat-bubble';
+    const nm=document.createElement('div'); nm.className='chat-name';
+    nm.style.color=line.side==='right'?'var(--pink)':'var(--cyan)'; nm.textContent=line.name;
+    const en=document.createElement('div'); en.className='bubble-en'; en.textContent=line.en;
+    const ja=document.createElement('div'); ja.className='bubble-ja'; ja.textContent=line.ja;
+    const ic=document.createElement('span'); ic.className='chat-speaker-icon'; ic.textContent='🔊';
+    bubble.appendChild(nm); bubble.appendChild(en); bubble.appendChild(ja); bubble.appendChild(ic);
+    bubble.addEventListener('click',()=>speak(line.en));
+    if(line.side==='right'){div.appendChild(bubble);div.appendChild(av);}
+    else{div.appendChild(av);div.appendChild(bubble);}
+    el.appendChild(div);
+    setTimeout(()=>div.classList.add('show'),100+i*150);
+  });
+  const ctrl=document.getElementById(controlsId);
+  if(ctrl&&!ctrl.dataset.built){ ctrl.dataset.built='1';
+    const ab=document.createElement('button'); ab.className='btn btn-sm btn-primary'; ab.textContent='🔊 Play All';
+    ab.addEventListener('click',()=>{
+      let d=0; lines.forEach(l=>{setTimeout(()=>speak(l.en),d); d+=l.en.split(' ').length*400+500;});
+    });
+    const sb=document.createElement('button'); sb.className='script-toggle-btn'; sb.textContent='📜 Show/Hide Japanese';
+    sb.addEventListener('click',()=>{
+      document.querySelectorAll(`#${containerId} .bubble-ja`).forEach(j=>{j.style.display=j.style.display==='none'?'':'none';});
+    });
+    ctrl.appendChild(ab); ctrl.appendChild(sb);
+  }
+}
+const buildRoleplayA=()=>buildRoleplay('roleplay-a',ROLEPLAY_A,'rp-a-controls');
+const buildRoleplayB=()=>buildRoleplay('roleplay-b',ROLEPLAY_B,'rp-b-controls');
+
+/* ================================================================
+   WHO AM I?
+================================================================ */
+let wiIdx=0,wiClue=0,wiScore=0;
+function initWhoami(){
+  const el=document.getElementById('whoami-clue-box');
+  if(el.dataset.built) return; el.dataset.built='1';
+  wiIdx=0; wiClue=0; wiScore=0; loadWI();
+  document.getElementById('next-clue-btn').addEventListener('click',()=>{
+    wiClue=Math.min(wiClue+1,WHOAMI_DATA[wiIdx].clues.length-1);
+    showWIClues();
+  });
+}
+function loadWI(){ wiClue=0; showWIClues(); buildWIOptions(); updateWIScore(); }
+function showWIClues(){
+  const q=WHOAMI_DATA[wiIdx];
+  const box=document.getElementById('whoami-clues'); box.innerHTML='';
+  for(let i=0;i<=wiClue;i++){
+    const d=document.createElement('div'); d.className='clue-text';
+    d.style.whiteSpace='pre-line'; d.textContent=`Clue ${i+1}: ${q.clues[i]}`; box.appendChild(d);
+  }
+  document.getElementById('next-clue-btn').style.display=wiClue>=q.clues.length-1?'none':'inline-flex';
+}
+function buildWIOptions(){
+  const q=WHOAMI_DATA[wiIdx];
+  const wrap=document.getElementById('whoami-options'); wrap.innerHTML='';
+  shuffle([...q.options]).forEach(opt=>{
+    const btn=document.createElement('button'); btn.className='whoami-btn'; btn.textContent=opt;
+    btn.addEventListener('click',()=>{
+      const ok=opt.toLowerCase().includes(q.answer.toLowerCase());
+      btn.classList.add(ok?'correct-ans':'wrong-ans');
+      wrap.querySelectorAll('.whoami-btn').forEach(b=>b.disabled=true);
+      if(ok){wiScore++;addScore(15);speak('Correct! Well done!');}
+      else speak('Try again next time!');
+      setTimeout(()=>{
+        wiIdx++;
+        if(wiIdx<WHOAMI_DATA.length){wiClue=0;loadWI();}
+        else{
+          document.getElementById('whoami-clues').innerHTML=`<div class="clue-text">🎉 All done! Score: ${wiScore}/${WHOAMI_DATA.length}</div>`;
+          wrap.innerHTML='';
+          document.getElementById('next-clue-btn').style.display='none';
+          if(wiScore>=4) awardBadge('🤔','Quiz Champ!');
+        }
+      },1200);
+    });
+    wrap.appendChild(btn);
+  });
+}
+function updateWIScore(){
+  document.getElementById('whoami-score').textContent=`Question: ${wiIdx+1} / ${WHOAMI_DATA.length}`;
+}
+
+/* ================================================================
+   FIND-IT GAME
+================================================================ */
+let fiIdx=0,fiScore=0,fiTimer=null;
+function initFindit(){
+  const el=document.getElementById('findit-grid');
+  if(el.dataset.built) return; el.dataset.built='1';
+  fiIdx=0; fiScore=0; loadFIRound();
+}
+function loadFIRound(){
+  if(fiIdx>=FINDIT_DATA.length){
+    document.getElementById('findit-target').textContent='🎉 Done!';
+    document.getElementById('findit-target-ja').textContent=`Final Score: ${fiScore}/${FINDIT_DATA.length}`;
+    document.getElementById('findit-grid').innerHTML='';
+    if(fiTimer) clearInterval(fiTimer);
+    if(fiScore>=6) awardBadge('⚡','Speed Star!');
+    return;
+  }
+  const q=FINDIT_DATA[fiIdx];
+  document.getElementById('fi-round').textContent=fiIdx+1;
+  document.getElementById('fi-score').textContent=fiScore;
+  document.getElementById('findit-target').textContent=`${q.emoji} ${q.target}`;
+  document.getElementById('findit-target-ja').textContent=q.targetJa;
+  document.getElementById('findit-feedback').textContent='';
+  speak(q.target);
+  const opts=shuffle([...q.options]);
+  const grid=document.getElementById('findit-grid'); grid.innerHTML='';
+  opts.forEach(opt=>{
+    const btn=document.createElement('div'); btn.className='findit-option';
+    const em=document.createElement('div'); em.className='fi-emoji'; em.textContent=opt.emoji;
+    const wd=document.createElement('div'); wd.textContent=opt.word;
+    btn.appendChild(em); btn.appendChild(wd);
+    btn.addEventListener('click',()=>{
+      if(fiTimer) clearInterval(fiTimer);
+      const isTarget=opt.emoji===q.emoji&&opt.word===q.target;
+      btn.classList.add(isTarget?'correct-pick':'wrong-pick');
+      grid.querySelectorAll('.findit-option').forEach(b=>b.style.pointerEvents='none');
+      if(isTarget){
+        fiScore++; addScore(12);
+        document.getElementById('findit-feedback').innerHTML=`<span style="color:var(--green)">✅ Found it! みつけた！</span>`;
+        speak('Found it!');
+      } else {
+        document.getElementById('findit-feedback').innerHTML=`<span style="color:var(--coral)">❌ Wrong! もういちど！</span>`;
+      }
+      setTimeout(()=>{fiIdx++; loadFIRound();},1000);
+    });
+    grid.appendChild(btn);
+  });
+  startFITimer();
+}
+function startFITimer(){
+  if(fiTimer) clearInterval(fiTimer);
+  const bar=document.getElementById('findit-timer-bar');
+  let pct=100; const dur=5000; const start=Date.now();
+  bar.style.width='100%';
+  bar.style.background='linear-gradient(90deg,var(--green),var(--teal))';
+  fiTimer=setInterval(()=>{
+    pct=100-((Date.now()-start)/dur)*100;
+    if(pct<30) bar.style.background='linear-gradient(90deg,var(--coral),var(--yellow))';
+    bar.style.width=Math.max(0,pct)+'%';
+    if(pct<=0){
+      clearInterval(fiTimer);
+      document.getElementById('findit-feedback').innerHTML=`<span style="color:var(--yellow)">⏱ Time up!</span>`;
+      document.getElementById('findit-grid').querySelectorAll('.findit-option').forEach(b=>b.style.pointerEvents='none');
+      setTimeout(()=>{fiIdx++;loadFIRound();},900);
+    }
+  },50);
+}
+
+/* ================================================================
+   GAME 2: FEEDING TIME!（新設計）
+   ─ 落ちてくる食べ物を英語で理解してタップ
+   ─ 正解の食べ物だけタップ→魚が食べる演出
+================================================================ */
+let feedIdx=0, feedScore=0, feedActive=false, feedDropInterval=null;
+const FOOD_POOL=['🍕','🍦','🍎','🍔','🎂','🌽','🍩','🍭','🥐','🍰'];
+
+function initFeedingTime(){
+  const el=document.getElementById('feed-scene');
+  if(el.dataset.built) return; el.dataset.built='1';
+  feedIdx=0; feedScore=0;
+  spawnFeedBubbles();
+  loadFeedRound();
+}
+
+function loadFeedRound(){
+  if(feedIdx>=FEED_ROUNDS.length){
+    document.getElementById('feed-word-en').textContent='🎉 Done!';
+    document.getElementById('feed-word-ja').textContent=`Score: ${feedScore}/${FEED_ROUNDS.length}`;
+    document.getElementById('feed-round').textContent=feedIdx;
+    stopDropping();
+    if(feedScore>=6) awardBadge('🍤','Feeding Champion!');
+    return;
+  }
+  const r=FEED_ROUNDS[feedIdx];
+  document.getElementById('feed-round').textContent=feedIdx+1;
+  document.getElementById('feed-score-num').textContent=feedScore;
+  document.getElementById('feed-score-fill').style.width=`${(feedScore/FEED_ROUNDS.length)*100}%`;
+  document.getElementById('feed-word-en').textContent=`Feed the ${r.fish_en}! ${r.fish}`;
+  document.getElementById('feed-word-ja').textContent=`${r.fishJa}に えさをあげよう！`;
+  document.getElementById('feed-feedback').textContent='';
+  buildFishRow(r);
+  speak(`Feed the ${r.fish_en}!`);
+  startDropping(r);
+}
+
+function buildFishRow(r){
+  const row=document.getElementById('fish-row'); row.innerHTML='';
+  // 正解の魚を中央に
+  const fishEl=document.createElement('div');
+  fishEl.className='fish-char'; fishEl.textContent=r.fish; fishEl.id='main-fish';
+  row.appendChild(fishEl);
+  // 他の魚（ダミー）
+  ['🐡','🐠'].forEach(f=>{
+    const d=document.createElement('div'); d.className='fish-char'; d.textContent=f; row.appendChild(d);
+  });
+}
+
+function spawnFeedBubbles(){
+  const layer=document.getElementById('feed-bubbles-layer');
+  for(let i=0;i<8;i++){
+    const b=document.createElement('div'); b.className='feed-bubble-anim';
+    const sz=Math.random()*14+6;
+    b.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:${Math.random()*50}px;
+      animation-duration:${Math.random()*4+3}s;animation-delay:${Math.random()*3}s;`;
+    layer.appendChild(b);
+  }
+}
+
+function startDropping(r){
+  stopDropping(); feedActive=true;
+  let dropsRemaining=6; // 6個落とす→正解1+不正解5
+  let correctDropped=false;
+
+  function dropOne(){
+    if(!feedActive||dropsRemaining<=0) return;
+    dropsRemaining--;
+    const scene=document.getElementById('feed-scene');
+    const useCorrect=!correctDropped&&(dropsRemaining===0||Math.random()<0.35);
+    const foodEmoji= useCorrect? r.correctFood : FOOD_POOL[Math.floor(Math.random()*FOOD_POOL.length)];
+    const isCorrect= useCorrect;
+    if(useCorrect) correctDropped=true;
+
+    const food=document.createElement('div');
+    food.className='food-item';
+    food.textContent=foodEmoji;
+    const label=document.createElement('div');
+    label.className='food-label';
+    label.textContent=isCorrect?r.correctLabel:'wrong food';
+    food.appendChild(label);
+    food.style.left=`${15+Math.random()*70}%`;
+    const fallTime=3+Math.random()*2;
+    food.style.animationDuration=`${fallTime}s`;
+    scene.appendChild(food);
+
+    food.addEventListener('click',()=>{
+      if(!feedActive) return;
+      food.remove();
+      if(isCorrect){
+        feedActive=false; stopDropping();
+        feedScore++; addScore(15);
+        document.getElementById('feed-feedback').innerHTML=`<span style="color:var(--green)">✅ Great! えさを あげられたよ！</span>`;
+        // 魚が食べるアニメ
+        const mf=document.getElementById('main-fish');
+        if(mf){mf.classList.add('eating');}
+        speak('Great job!');
+        // 正解閃光
+        const flash=document.createElement('div');
+        flash.style.cssText=`position:absolute;inset:0;background:rgba(6,214,160,0.2);pointer-events:none;
+          border-radius:var(--radius);animation:flashFade 0.4s ease forwards;`;
+        scene.appendChild(flash);
+        setTimeout(()=>flash.remove(),500);
+        setTimeout(()=>{feedIdx++;loadFeedRound();},1200);
+      } else {
+        // 不正解エフェクト
+        document.getElementById('feed-feedback').innerHTML=`<span style="color:var(--coral)">❌ Wrong food! それは ちがうよ！</span>`;
+        const flash=document.createElement('div'); flash.className='feed-wrong-flash';
+        scene.appendChild(flash); setTimeout(()=>flash.remove(),400);
+      }
+    });
+
+    // 落ちきったら削除
+    setTimeout(()=>food.remove(), fallTime*1000+200);
+  }
+
+  // 最初の1個をすぐに
+  dropOne();
+  feedDropInterval=setInterval(()=>{
+    if(!feedActive) return;
+    if(dropsRemaining>0) dropOne();
+    else {
+      stopDropping();
+      // 正解が出なかった場合タイムアウト
+      if(feedActive){
+        feedActive=false;
+        document.getElementById('feed-feedback').innerHTML=`<span style="color:var(--yellow)">⏱ Time up! じかんぎれ！</span>`;
+        setTimeout(()=>{feedIdx++;loadFeedRound();},1100);
+      }
+    }
+  }, 1500);
+}
+
+function stopDropping(){
+  feedActive=false;
+  if(feedDropInterval){clearInterval(feedDropInterval);feedDropInterval=null;}
+  // 残ってる落下物を消去
+  document.querySelectorAll('.food-item').forEach(f=>f.remove());
+}
+
+/* ================================================================
+   MIKKE HIDDEN OBJECT（改善版：ヒントボタン追加・難易度調整済み）
+================================================================ */
+let mikkeRoom=0,mikkeFound=0,mikkeTimer=null,mikkeActive=false,mikkeHintUsed=false;
+
+function initMikke(){
+  const wrap=document.getElementById('mikke-wrapper');
+  if(wrap.dataset.built) return; wrap.dataset.built='1';
+  document.getElementById('mikke-hint-btn').addEventListener('click',useMikkeHint);
+  loadMikkeRoom(0);
+}
+
+function loadMikkeRoom(idx){
+  mikkeFound=0; mikkeActive=true; mikkeHintUsed=false; mikkeRoom=idx;
+  const room=MIKKE_ROOMS[idx];
+  document.getElementById('mikke-room-name').textContent=room.name;
+  document.getElementById('mikke-found-count').textContent=`Found: 0 / ${room.targets.length}`;
+  document.getElementById('mikke-timer-display').style.color='';
+  document.getElementById('mikke-hint-btn').disabled=false;
+  document.getElementById('mikke-hint-btn').textContent='💡 Hint! ヒントをみる';
+  const img=document.getElementById('mikke-img');
+  img.src=room.img; img.onerror=()=>{img.src=room.fallback;};
+  // チップ
+  const disp=document.getElementById('mikke-target-display'); disp.innerHTML='';
+  room.targets.forEach(t=>{
+    const chip=document.createElement('div'); chip.className='mikke-target-chip'; chip.id=`chip-${t.word}`;
+    chip.innerHTML=`<span>${t.emoji}</span><span>${t.word} <small style="color:var(--aqua)">(${t.ja})</small></span>`;
+    disp.appendChild(chip);
+  });
+  // ピン
+  const overlay=document.getElementById('mikke-overlay'); overlay.innerHTML='';
+  room.targets.forEach(t=>{
+    const pin=document.createElement('div'); pin.className='mikke-target';
+    pin.textContent=t.emoji;
+    pin.style.left=t.x+'%'; pin.style.top=t.y+'%';
+    pin.dataset.word=t.word;
+    pin.addEventListener('click',()=>onMikkeFind(pin,t,room,idx));
+    overlay.appendChild(pin);
+  });
+  startMikkeTimer(room.targets.length,idx);
+}
+
+function onMikkeFind(pin,t,room,idx){
+  if(!mikkeActive||pin.classList.contains('found')) return;
+  pin.classList.add('found');
+  const chip=document.getElementById(`chip-${t.word}`);
+  if(chip) chip.classList.add('found');
+  mikkeFound++; addScore(18); speak(`Found the ${t.word}!`);
+  document.getElementById('mikke-found-count').textContent=`Found: ${mikkeFound} / ${room.targets.length}`;
+  // ポップアップ
+  const popup=document.createElement('div');
+  popup.style.cssText=`position:absolute;left:${t.x}%;top:${t.y}%;z-index:10;
+    background:var(--green);color:#0a1628;font-weight:800;font-size:0.82rem;
+    padding:3px 10px;border-radius:12px;pointer-events:none;
+    animation:popIn 0.3s ease;white-space:nowrap;transform:translate(-50%,-130%);`;
+  popup.textContent=`✅ ${t.word}!`;
+  document.getElementById('mikke-overlay').appendChild(popup);
+  setTimeout(()=>popup.remove(),1400);
+
+  if(mikkeFound>=room.targets.length){
+    mikkeActive=false;
+    if(mikkeTimer) clearInterval(mikkeTimer);
+    setTimeout(()=>{
+      if(idx<MIKKE_ROOMS.length-1){
+        awardBadge('🔍',`Room ${idx+1} Clear!`);
+        showOverlay('🎉','Room Clear!',`All creatures found!\nつぎのへやへ！`,()=>loadMikkeRoom(idx+1));
+      } else {
+        awardBadge('🏆','Mikke Master!');
+        launchConfetti();
+        showOverlay('🏆','All Rooms Clear!','You found everything!\nぜんぶ みつけた！すごい！！');
+      }
+    },400);
+  }
+}
+
+function useMikkeHint(){
+  if(!mikkeActive) return;
+  // 未発見のターゲットをランダムに1つ光らせる
+  const unfound=Array.from(document.querySelectorAll('.mikke-target:not(.found)'));
+  if(!unfound.length) return;
+  const target=unfound[Math.floor(Math.random()*unfound.length)];
+  const px=parseFloat(target.style.left);
+  const py=parseFloat(target.style.top);
+  const overlay=document.getElementById('mikke-overlay');
+  const flash=document.createElement('div'); flash.className='mikke-hint-flash';
+  flash.style.left=px+'%'; flash.style.top=py+'%';
+  overlay.appendChild(flash); setTimeout(()=>flash.remove(),1000);
+  document.getElementById('mikke-hint-btn').disabled=true;
+  document.getElementById('mikke-hint-btn').textContent='💡 Used! (1 per room)';
+}
+
+function startMikkeTimer(total,idx){
+  if(mikkeTimer) clearInterval(mikkeTimer);
+  let sec=60;
+  document.getElementById('mikke-timer-display').textContent=`⏱ ${sec}s`;
+  document.getElementById('mikke-timer-bar').style.width='100%';
+  mikkeTimer=setInterval(()=>{
+    sec--;
+    document.getElementById('mikke-timer-display').textContent=`⏱ ${sec}s`;
+    document.getElementById('mikke-timer-bar').style.width=`${(sec/60)*100}%`;
+    if(sec<=10) document.getElementById('mikke-timer-display').style.color='var(--coral)';
+    if(sec<=0){
+      clearInterval(mikkeTimer); mikkeActive=false;
+      showOverlay('⏱','Time Up!',`You found ${mikkeFound}/${total}!\nもういちど チャレンジ！`,
+        ()=>loadMikkeRoom(idx));
+    }
+  },1000);
+}
+
+/* ================================================================
+   FISH QUIZ
+================================================================ */
+let fqIdx=0,fqScore=0;
+function initFishquiz(){
+  const el=document.getElementById('fishquiz-options');
+  if(el.dataset.built) return; el.dataset.built='1';
+  fqIdx=0; fqScore=0; buildFQDots(); loadFQ();
+}
+function buildFQDots(){
+  const p=document.getElementById('fishquiz-prog'); p.innerHTML='';
+  FISHQUIZ_DATA.forEach(()=>{const d=document.createElement('div');d.className='fq-dot';p.appendChild(d);});
+}
+function loadFQ(){
+  if(fqIdx>=FISHQUIZ_DATA.length){
+    document.getElementById('fishquiz-question').textContent=`🎉 Done! Score: ${fqScore}/${FISHQUIZ_DATA.length}`;
+    document.getElementById('fishquiz-options').innerHTML='';
+    if(fqScore>=5) awardBadge('🐡','Fish Quiz Master!');
+    return;
+  }
+  const q=FISHQUIZ_DATA[fqIdx];
+  const img=document.getElementById('fishquiz-img');
+  img.src=q.img; img.onerror=()=>{img.src='https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=800&q=80';};
+  document.getElementById('fishquiz-question').textContent=q.q;
+  document.getElementById('fishquiz-score').textContent=`Score: ${fqScore} / ${fqIdx}`;
+  const opts=document.getElementById('fishquiz-options'); opts.innerHTML='';
+  shuffle([...q.options]).forEach(opt=>{
+    const btn=document.createElement('button'); btn.className='fq-btn'; btn.textContent=opt;
+    btn.addEventListener('click',()=>{
+      const ok=opt===q.answer;
+      btn.classList.add(ok?'correct':'wrong');
+      opts.querySelectorAll('.fq-btn').forEach(b=>{
+        b.disabled=true;
+        if(b.textContent===q.answer) b.classList.add('correct');
+      });
+      if(ok){fqScore++;addScore(15);speak('Correct!');}
+      else speak('Try again!');
+      const dots=document.querySelectorAll('.fq-dot');
+      if(dots[fqIdx]) dots[fqIdx].className='fq-dot '+(ok?'done':'fq-wrong');
+      setTimeout(()=>{fqIdx++;loadFQ();},1200);
+    });
+    opts.appendChild(btn);
+  });
+}
+
+/* ================================================================
+   WORD SCRAMBLE
+================================================================ */
+let scrIdx=0,scrScore=0,scrAnswer=[];
+function initScramble(){
+  const el=document.getElementById('scramble-options');
+  if(el.dataset.built) return; el.dataset.built='1';
+  scrIdx=0; scrScore=0; loadScr();
+  document.getElementById('scramble-clear-btn').addEventListener('click',clearScr);
+}
+function loadScr(){
+  if(scrIdx>=SCRAMBLE_DATA.length){
+    document.getElementById('scramble-word').textContent='🎉';
+    document.getElementById('scramble-hint').textContent=`Finished! Score: ${scrScore}/${SCRAMBLE_DATA.length}`;
+    document.getElementById('scramble-options').innerHTML='';
+    document.getElementById('scramble-answer').innerHTML='';
+    document.getElementById('scramble-emoji').textContent='🏆';
+    if(scrScore>=5) awardBadge('🔤','Scramble Pro!');
+    return;
+  }
+  const d=SCRAMBLE_DATA[scrIdx];
+  document.getElementById('scramble-emoji').textContent=d.emoji;
+  document.getElementById('scramble-hint').textContent=`Hint: ${d.hint}  (${d.ja})`;
+  document.getElementById('scramble-feedback').textContent='';
+  document.getElementById('scramble-info').textContent=`Word ${scrIdx+1}/${SCRAMBLE_DATA.length} | Score: ${scrScore}`;
+  scrAnswer=[];
+  renderScr(d);
+}
+function renderScr(d){
+  const opts=document.getElementById('scramble-options'); opts.innerHTML='';
+  shuffle(d.word.split('')).forEach((ch,i)=>{
+    const el=document.createElement('div'); el.className='scr-letter'; el.textContent=ch; el.dataset.i=i;
+    el.addEventListener('click',()=>{
+      if(el.classList.contains('used')) return;
+      el.classList.add('used'); scrAnswer.push({ch,el}); renderScrAnswer(d);
+    });
+    opts.appendChild(el);
+  });
+  renderScrAnswer(d);
+}
+function renderScrAnswer(d){
+  const ans=document.getElementById('scramble-answer'); ans.innerHTML='';
+  for(let i=0;i<d.word.length;i++){
+    const sl=document.createElement('div'); sl.className='scr-slot';
+    if(scrAnswer[i]){sl.textContent=scrAnswer[i].ch; sl.classList.add('filled');}
+    ans.appendChild(sl);
+  }
+  document.getElementById('scramble-word').textContent=scrAnswer.map(x=>x.ch).join('')||'_'.repeat(d.word.length);
+  if(scrAnswer.length===d.word.length){
+    const typed=scrAnswer.map(x=>x.ch).join('');
+    if(typed===d.word){
+      document.getElementById('scramble-feedback').innerHTML=`<span style="color:var(--green)">✅ Correct! せいかい！</span>`;
+      scrScore++; addScore(15); speak(d.word.toLowerCase());
+      setTimeout(()=>{scrIdx++;loadScr();},1100);
+    } else {
+      document.getElementById('scramble-feedback').innerHTML=`<span style="color:var(--coral)">❌ Wrong! もういちど！</span>`;
+      setTimeout(clearScr,700);
+    }
+  }
+}
+function clearScr(){
+  scrAnswer=[]; document.querySelectorAll('.scr-letter').forEach(el=>el.classList.remove('used'));
+  const d=SCRAMBLE_DATA[scrIdx];
+  if(d){document.getElementById('scramble-word').textContent='_'.repeat(d.word.length);renderScrAnswer(d);}
+}
+
+/* ================================================================
+   REVIEW
+================================================================ */
+function buildReview(){
+  const grid=document.getElementById('review-grid');
+  if(grid.dataset.built) return; grid.dataset.built='1';
+  REVIEW_DATA.forEach(r=>{
+    const c=document.createElement('div'); c.className='review-card';
+    c.innerHTML=`<div class="review-emoji">${r.emoji}</div>
+      <div class="review-en">${r.en}</div>
+      <div class="review-ja">${r.ja}</div>
+      <div class="review-ex">"${r.ex}"</div>`;
+    c.addEventListener('click',()=>speak(`${r.en}. ${r.ex}`));
+    grid.appendChild(c);
+  });
+}
+
+/* ================================================================
+   SUMMARY
+================================================================ */
+function buildSummary(){
+  const grid=document.getElementById('summary-grid');
+  if(grid.dataset.built) return; grid.dataset.built='1';
+  ANIMAL_VOCAB.slice(0,6).forEach((v,i)=>{
+    const c=document.createElement('div'); c.className='summary-chip';
+    c.innerHTML=`<div class="summary-emoji">${v.emoji}</div>
+      <div class="summary-word">${v.en}</div><div class="summary-ja">${v.ja}</div>`;
+    c.style.animationDelay=`${i*0.08}s`;
+    c.addEventListener('click',()=>speak(v.en));
+    grid.appendChild(c);
+  });
+  document.getElementById('final-score').textContent=`${score} pts`;
+  const msgs=[[80,'🏆 Perfect! かんぺき！'],[60,'🌟 Great job! よくできました！'],[40,'👍 Good try! がんばったね！'],[0,'🐠 Keep swimming! もっと やってみよう！']];
+  const m=msgs.find(x=>score>=x[0]);
+  document.getElementById('final-msg').textContent=m?m[1]:'🐠 Well done!';
+  launchConfetti();
+  awardBadge('🎓','Lesson Complete!');
+}
+
+/* ================================================================
+   UTILITY
+================================================================ */
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+/* ================================================================
+   INIT
+================================================================ */
+function init(){
+  createBubbles();
+  buildNavDots();
+  document.getElementById('start-btn').addEventListener('click',()=>goSlide(2));
+  document.getElementById('back-btn').addEventListener('click',()=>navigate(-1));
+  document.getElementById('next-btn').addEventListener('click',()=>navigate(1));
+  document.getElementById('overlay-close').addEventListener('click',hideOverlay);
+  document.getElementById('restart-btn').addEventListener('click',()=>{
+    score=0; document.getElementById('score-num').textContent='0';
+    earnedBadges=[];
+    document.getElementById('badge-bar').innerHTML='<span style="color:rgba(255,255,255,0.3);font-size:0.8rem;">🏆 Earn badges as you go!</span>';
+    document.querySelectorAll('[data-built]').forEach(el=>delete el.dataset.built);
+    stopDropping();
+    if(mikkeTimer) clearInterval(mikkeTimer);
+    if(fiTimer) clearInterval(fiTimer);
+    goSlide(1);
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight') navigate(1);
+    if(e.key==='ArrowLeft')  navigate(-1);
+  });
+  updateProgress();
+}
+window.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
